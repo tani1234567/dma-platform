@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserRole() == 'super_admin';
+    }
+    function isCompanyAdmin(companyId) {
+      return isAuthenticated() &&
+             request.auth.uid == companyId &&
+             getUserRole() == 'company_admin';
+    }
+    function isFieldAgent(companyId) {
+      return isAuthenticated() &&
+             getUserRole() == 'field_agent' &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.companyId == companyId;
+    }
+
+    // GRI Topics — read: any authenticated, write: super_admin only
+    match /gri_topics/{topicId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Users — read/write own doc only, or super_admin
+    match /users/{userId} {
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == userId || isSuperAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAuthenticated() &&
+                       (request.auth.uid == userId || isSuperAdmin());
+      allow delete: if isSuperAdmin();
+    }
+
+    // Companies
+    match /companies/{companyId} {
+      allow read: if isCompanyAdmin(companyId) || isSuperAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == companyId;
+      allow update: if isCompanyAdmin(companyId) || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+
+      // Assessments
+      match /assessments/{fyId} {
+        allow read: if isCompanyAdmin(companyId) ||
+                       isSuperAdmin() ||
+                       isFieldAgent(companyId);
+        allow create: if isCompanyAdmin(companyId);
+        allow update: if isCompanyAdmin(companyId) || isSuperAdmin();
+        allow delete: if isSuperAdmin();
+
+        // Stakeholders
+        match /stakeholders/{stakeholderId} {
+          allow read: if isCompanyAdmin(companyId) ||
+                         isSuperAdmin() ||
+                         isFieldAgent(companyId);
+          allow create: if isCompanyAdmin(companyId);
+          allow update: if isCompanyAdmin(companyId) ||
+                           isFieldAgent(companyId);
+          allow delete: if isCompanyAdmin(companyId);
+        }
+
+        // Responses — NO direct client writes ever
+        match /responses/{responseId} {
+          allow read: if isCompanyAdmin(companyId) || isSuperAdmin();
+          allow write: if false; // Cloud Function / API route only
+        }
+
+        // Scores — NO direct client writes ever
+        match /scores/{document=**} {
+          allow read: if isCompanyAdmin(companyId) || isSuperAdmin();
+          allow write: if false; // Cloud Function / API route only
+        }
+      }
+    }
+  }
+}

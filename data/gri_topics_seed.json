@@ -1,0 +1,602 @@
+[
+  {
+    "code": "E1",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Climate Change & GHG Emissions",
+    "description": "Management of Scope 1, 2, and 3 greenhouse gas emissions and climate change mitigation strategies.",
+    "griReference": "GRI 305",
+    "questions": [
+      { "id": "E1_Q1", "text": "How important is it for this company to measure and report its direct (Scope 1) greenhouse gas emissions?" },
+      { "id": "E1_Q2", "text": "How significant is the company's indirect emissions from purchased energy (Scope 2) as a sustainability concern?" },
+      { "id": "E1_Q3", "text": "How critical is it for the company to track and reduce value chain (Scope 3) emissions?" },
+      { "id": "E1_Q4", "text": "How much does climate change pose a financial risk or opportunity to this company's business operations?" },
+      { "id": "E1_Q5", "text": "How important is it for the company to set science-based targets for reducing its carbon footprint?" }
+    ]
+  },
+  {
+    "code": "E2",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Energy Consumption",
+    "description": "Total energy consumption, energy intensity, and efficiency measures within the organisation.",
+    "griReference": "GRI 302",
+    "questions": [
+      { "id": "E2_Q1", "text": "How important is it for this company to actively monitor and reduce its total energy consumption?" },
+      { "id": "E2_Q2", "text": "How significant is energy cost as a financial risk to this company's operations?" },
+      { "id": "E2_Q3", "text": "How important is it for the company to improve energy efficiency across its manufacturing processes?" },
+      { "id": "E2_Q4", "text": "How material is energy consumption data as part of the company's sustainability reporting?" },
+      { "id": "E2_Q5", "text": "How critical is it for the company to reduce energy intensity (energy per unit of production) year-on-year?" }
+    ]
+  },
+  {
+    "code": "E3",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Renewable Energy",
+    "description": "Adoption of solar, wind, and other clean energy sources to reduce dependence on fossil fuels.",
+    "griReference": "GRI 302",
+    "questions": [
+      { "id": "E3_Q1", "text": "How important is it for this company to increase its share of renewable energy in total energy consumption?" },
+      { "id": "E3_Q2", "text": "How significant is the transition to renewable energy as a long-term financial benefit for the company?" },
+      { "id": "E3_Q3", "text": "How material is the company's investment in on-site renewable energy (e.g. rooftop solar) to its sustainability goals?" },
+      { "id": "E3_Q4", "text": "How important is renewable energy adoption in improving the company's reputation with stakeholders?" },
+      { "id": "E3_Q5", "text": "How critical is renewable energy procurement (e.g. RECs, PPAs) to achieving the company's net-zero commitments?" }
+    ]
+  },
+  {
+    "code": "E4",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Water Withdrawal",
+    "description": "Total water withdrawn from surface, ground, and municipal sources and water consumption management.",
+    "griReference": "GRI 303",
+    "questions": [
+      { "id": "E4_Q1", "text": "How important is it for this company to monitor and reduce its total water withdrawal from natural sources?" },
+      { "id": "E4_Q2", "text": "How significant is water scarcity as a business risk in the regions where this company operates?" },
+      { "id": "E4_Q3", "text": "How material is water usage data to the company's environmental performance reporting?" },
+      { "id": "E4_Q4", "text": "How critical is water conservation to maintaining the company's social license to operate in its local communities?" },
+      { "id": "E4_Q5", "text": "How important is it for the company to set and track annual targets for reducing water consumption?" }
+    ]
+  },
+  {
+    "code": "E5",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Water Pollution",
+    "description": "Quality and treatment of water discharged including effluent management and prevention of water body contamination.",
+    "griReference": "GRI 303",
+    "questions": [
+      { "id": "E5_Q1", "text": "How important is it for this company to treat and manage all wastewater before discharge?" },
+      { "id": "E5_Q2", "text": "How significant is the risk of effluent discharge causing harm to local water bodies and communities?" },
+      { "id": "E5_Q3", "text": "How material is regulatory compliance around water discharge quality to the company's legal and financial standing?" },
+      { "id": "E5_Q4", "text": "How critical is it for the company to disclose the quality and volume of its water discharges publicly?" },
+      { "id": "E5_Q5", "text": "How important is the prevention of water pollution in building trust with local communities near the company's operations?" }
+    ]
+  },
+  {
+    "code": "E6",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Waste Management",
+    "description": "Generation, handling, and disposal of solid non-hazardous waste across operations.",
+    "griReference": "GRI 306",
+    "questions": [
+      { "id": "E6_Q1", "text": "How important is it for the company to track and reduce the total volume of solid waste generated in its operations?" },
+      { "id": "E6_Q2", "text": "How significant is improper waste disposal as an environmental and reputational risk for this company?" },
+      { "id": "E6_Q3", "text": "How material is waste diversion (recycling + reuse) rate as an indicator of the company's environmental performance?" },
+      { "id": "E6_Q4", "text": "How critical is it for the company to adopt zero-waste-to-landfill practices in its manufacturing operations?" },
+      { "id": "E6_Q5", "text": "How important is transparent waste reporting to your confidence in this company's sustainability commitments?" }
+    ]
+  },
+  {
+    "code": "E7",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Hazardous Waste",
+    "description": "Generation, handling, storage, transportation, and disposal of hazardous and chemical waste.",
+    "griReference": "GRI 306",
+    "questions": [
+      { "id": "E7_Q1", "text": "How important is it for the company to strictly control and minimise hazardous waste generated in its processes?" },
+      { "id": "E7_Q2", "text": "How significant is the risk of hazardous waste causing harm to workers, communities, or the environment?" },
+      { "id": "E7_Q3", "text": "How material is compliance with hazardous waste regulations to the company's operational continuity?" },
+      { "id": "E7_Q4", "text": "How critical is the safe and documented disposal of chemical waste to this company's license to operate?" },
+      { "id": "E7_Q5", "text": "How important is it for the company to publicly disclose the types and quantities of hazardous waste it produces?" }
+    ]
+  },
+  {
+    "code": "E8",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Air Emissions",
+    "description": "Emissions of NOx, SOx, volatile organic compounds (VOCs), particulate matter, and other air pollutants.",
+    "griReference": "GRI 305",
+    "questions": [
+      { "id": "E8_Q1", "text": "How important is it for the company to monitor and reduce air pollutants such as NOx, SOx, and particulate matter?" },
+      { "id": "E8_Q2", "text": "How significant is the health impact of the company's air emissions on workers and surrounding communities?" },
+      { "id": "E8_Q3", "text": "How material is compliance with air quality regulations to the company's operational and financial risk?" },
+      { "id": "E8_Q4", "text": "How critical is investing in emission control technologies to the company's long-term environmental performance?" },
+      { "id": "E8_Q5", "text": "How important is transparent reporting of air emissions to your trust in this company as a responsible operator?" }
+    ]
+  },
+  {
+    "code": "E9",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Biodiversity Impact",
+    "description": "The company's impact on local ecosystems, land use, species habitats, and biodiversity protection.",
+    "griReference": "GRI 304",
+    "questions": [
+      { "id": "E9_Q1", "text": "How important is it for the company to assess and minimise its impact on local biodiversity and ecosystems?" },
+      { "id": "E9_Q2", "text": "How significant is the risk of the company's land use causing deforestation or habitat destruction?" },
+      { "id": "E9_Q3", "text": "How material is biodiversity protection to the company's ability to maintain its operating permits and social license?" },
+      { "id": "E9_Q4", "text": "How critical is it for the company to restore or offset any biodiversity damage caused by its operations?" },
+      { "id": "E9_Q5", "text": "How important is it for this company to disclose its biodiversity risks and mitigation measures in its sustainability report?" }
+    ]
+  },
+  {
+    "code": "E10",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Resource Efficiency",
+    "description": "Efficient use of raw materials, reduction of material intensity, and sustainable sourcing of inputs.",
+    "griReference": "GRI 301",
+    "questions": [
+      { "id": "E10_Q1", "text": "How important is it for the company to reduce the amount of raw materials consumed per unit of output?" },
+      { "id": "E10_Q2", "text": "How significant is resource scarcity as a supply chain risk to this company's production continuity?" },
+      { "id": "E10_Q3", "text": "How material is sustainable sourcing of raw materials to the company's environmental and social responsibility?" },
+      { "id": "E10_Q4", "text": "How critical is material efficiency improvement to reducing the company's overall environmental footprint?" },
+      { "id": "E10_Q5", "text": "How important is it for the company to track and publicly report its material consumption data?" }
+    ]
+  },
+  {
+    "code": "E11",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Circular Economy",
+    "description": "Practices of recycling, reuse, remanufacturing, and extending product life to minimise waste generation.",
+    "griReference": "GRI 301, GRI 306",
+    "questions": [
+      { "id": "E11_Q1", "text": "How important is it for the company to design products and processes that support circular economy principles?" },
+      { "id": "E11_Q2", "text": "How significant is the adoption of recycling and reuse programs to reducing the company's waste output?" },
+      { "id": "E11_Q3", "text": "How material is the circular economy strategy to the company's long-term cost savings and competitiveness?" },
+      { "id": "E11_Q4", "text": "How critical is product take-back or end-of-life management to the company's environmental commitments?" },
+      { "id": "E11_Q5", "text": "How important is the company's progress on circular economy to your assessment of its sustainability leadership?" }
+    ]
+  },
+  {
+    "code": "E12",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Product Life Cycle Impact",
+    "description": "Assessment of the full environmental footprint of products from raw material extraction to end-of-life disposal.",
+    "griReference": "GRI 301",
+    "questions": [
+      { "id": "E12_Q1", "text": "How important is it for the company to conduct life cycle assessments (LCA) for its key products?" },
+      { "id": "E12_Q2", "text": "How significant is the environmental impact of the company's products during their use phase by customers?" },
+      { "id": "E12_Q3", "text": "How material is reducing the end-of-life environmental impact of the company's products to its sustainability strategy?" },
+      { "id": "E12_Q4", "text": "How critical is eco-design (designing for reduced environmental impact) to this company's product development process?" },
+      { "id": "E12_Q5", "text": "How important is it for the company to communicate the environmental footprint of its products to customers?" }
+    ]
+  },
+  {
+    "code": "E13",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Climate Risk & Adaptation",
+    "description": "Identification and management of physical climate risks (floods, heat, drought) and transition risks (policy, technology).",
+    "griReference": "GRI 201, TCFD aligned",
+    "questions": [
+      { "id": "E13_Q1", "text": "How important is it for the company to identify and assess physical climate risks (e.g. flooding, extreme heat) to its operations?" },
+      { "id": "E13_Q2", "text": "How significant are regulatory transition risks (e.g. carbon taxes, new environmental laws) to the company's financial performance?" },
+      { "id": "E13_Q3", "text": "How material is climate adaptation planning (e.g. infrastructure resilience) to the company's long-term operational continuity?" },
+      { "id": "E13_Q4", "text": "How critical is the company's ability to adapt its business model to a low-carbon economy?" },
+      { "id": "E13_Q5", "text": "How important is climate risk disclosure to your confidence in the company's financial resilience and governance?" }
+    ]
+  },
+  {
+    "code": "E14",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Sustainable Packaging",
+    "description": "Reduction of packaging material use, shift to recyclable or biodegradable packaging, and elimination of single-use plastics.",
+    "griReference": "GRI 301, GRI 306",
+    "questions": [
+      { "id": "E14_Q1", "text": "How important is it for the company to reduce the total amount of packaging material used in its products?" },
+      { "id": "E14_Q2", "text": "How significant is plastic packaging waste as an environmental concern linked to this company's operations?" },
+      { "id": "E14_Q3", "text": "How material is the transition to recyclable or compostable packaging to the company's environmental commitments?" },
+      { "id": "E14_Q4", "text": "How critical is compliance with Extended Producer Responsibility (EPR) regulations to the company's legal standing?" },
+      { "id": "E14_Q5", "text": "How important is sustainable packaging innovation to the company's brand value and customer preference?" }
+    ]
+  },
+  {
+    "code": "E15",
+    "pillar": "Environmental",
+    "pillarCode": "E",
+    "topic": "Land Use Impact",
+    "description": "The company's impact on land through its operations, including deforestation risk, soil degradation, and land rehabilitation.",
+    "griReference": "GRI 304",
+    "questions": [
+      { "id": "E15_Q1", "text": "How important is it for the company to assess and minimise land disturbance caused by its operations or supply chain?" },
+      { "id": "E15_Q2", "text": "How significant is deforestation or land degradation risk associated with the company's raw material sourcing?" },
+      { "id": "E15_Q3", "text": "How material is responsible land use management to the company's environmental and social license to operate?" },
+      { "id": "E15_Q4", "text": "How critical is land rehabilitation and restoration after operational activities to the company's sustainability performance?" },
+      { "id": "E15_Q5", "text": "How important is it for the company to disclose its land use footprint and any associated community impacts?" }
+    ]
+  },
+  {
+    "code": "S1",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Employee Health & Safety",
+    "description": "Prevention of workplace injuries, fatalities, and occupational illnesses through safety management systems.",
+    "griReference": "GRI 403",
+    "questions": [
+      { "id": "S1_Q1", "text": "How important is it for the company to maintain a robust occupational health and safety management system?" },
+      { "id": "S1_Q2", "text": "How significant is the risk of workplace injuries and fatalities to this company's workforce and operations?" },
+      { "id": "S1_Q3", "text": "How material is the company's safety record (e.g. LTIFR, incident rate) to your assessment of its performance?" },
+      { "id": "S1_Q4", "text": "How critical is worker participation in safety programs and hazard reporting to a safe workplace?" },
+      { "id": "S1_Q5", "text": "How important is transparent reporting of health and safety incidents to your trust in this company?" }
+    ]
+  },
+  {
+    "code": "S2",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Occupational Health",
+    "description": "Protection of workers from long-term health impacts including chemical exposure, ergonomic hazards, and occupational illness.",
+    "griReference": "GRI 403",
+    "questions": [
+      { "id": "S2_Q1", "text": "How important is it for the company to protect workers from exposure to harmful chemicals, dust, or noise?" },
+      { "id": "S2_Q2", "text": "How significant is the risk of occupational illness (e.g. respiratory diseases, musculoskeletal disorders) among the company's workforce?" },
+      { "id": "S2_Q3", "text": "How material are regular health screenings and medical surveillance programs for the company's employees?" },
+      { "id": "S2_Q4", "text": "How critical is ergonomics and workplace design in preventing long-term health issues for workers?" },
+      { "id": "S2_Q5", "text": "How important is it for the company to track and report occupational illness rates as part of its sustainability disclosure?" }
+    ]
+  },
+  {
+    "code": "S3",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Employee Welfare",
+    "description": "Quality of employee benefits, well-being programs, work-life balance, and overall employee satisfaction.",
+    "griReference": "GRI 401",
+    "questions": [
+      { "id": "S3_Q1", "text": "How important is it for the company to provide comprehensive benefits (health insurance, leave, retirement) to all employees?" },
+      { "id": "S3_Q2", "text": "How significant is employee well-being and mental health support to workforce productivity and retention?" },
+      { "id": "S3_Q3", "text": "How material is work-life balance and flexible working arrangements to attracting and retaining talent?" },
+      { "id": "S3_Q4", "text": "How critical is the company's employee satisfaction level to its long-term operational performance?" },
+      { "id": "S3_Q5", "text": "How important is it for the company to extend welfare benefits equally to contract employees, not just permanent staff?" }
+    ]
+  },
+  {
+    "code": "S4",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Training & Skill Development",
+    "description": "Investment in employee learning, skills upgrading, vocational training, and career development programs.",
+    "griReference": "GRI 404",
+    "questions": [
+      { "id": "S4_Q1", "text": "How important is it for the company to invest in regular training and upskilling programs for its employees?" },
+      { "id": "S4_Q2", "text": "How significant is skills development to the company's ability to remain competitive and innovate?" },
+      { "id": "S4_Q3", "text": "How material is employee career development and internal promotion opportunity to workforce retention?" },
+      { "id": "S4_Q4", "text": "How critical is training on ESG, sustainability, and ethical conduct to the company's culture and compliance?" },
+      { "id": "S4_Q5", "text": "How important is it for the company to track and disclose average training hours per employee annually?" }
+    ]
+  },
+  {
+    "code": "S5",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Diversity & Inclusion",
+    "description": "Representation of women, minorities, and marginalised groups across all levels of the organisation.",
+    "griReference": "GRI 405",
+    "questions": [
+      { "id": "S5_Q1", "text": "How important is it for the company to achieve gender balance across all levels including senior management?" },
+      { "id": "S5_Q2", "text": "How significant is workforce diversity (gender, age, background) to the company's innovation and business performance?" },
+      { "id": "S5_Q3", "text": "How material are inclusion policies (e.g. anti-bias hiring, diversity targets) to the company's social responsibility?" },
+      { "id": "S5_Q4", "text": "How critical is the representation of differently-abled persons in the company's workforce to its D&I goals?" },
+      { "id": "S5_Q5", "text": "How important is transparent diversity data reporting to your confidence in this company's inclusive practices?" }
+    ]
+  },
+  {
+    "code": "S6",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Equal Opportunity",
+    "description": "Ensuring non-discrimination in hiring, promotion, compensation, and treatment across all employee categories.",
+    "griReference": "GRI 406",
+    "questions": [
+      { "id": "S6_Q1", "text": "How important is it for the company to have and enforce a clear non-discrimination policy across all HR processes?" },
+      { "id": "S6_Q2", "text": "How significant is the gender pay gap as a fairness and reputational risk for this company?" },
+      { "id": "S6_Q3", "text": "How material is equal pay for equal work to the company's ability to attract diverse talent?" },
+      { "id": "S6_Q4", "text": "How critical is equal access to promotions and leadership roles regardless of gender, caste, or religion?" },
+      { "id": "S6_Q5", "text": "How important is it for the company to have a formal grievance redressal mechanism for discrimination complaints?" }
+    ]
+  },
+  {
+    "code": "S7",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Child Labour",
+    "description": "Prevention of child labour in company operations and across the supply chain in compliance with international standards.",
+    "griReference": "GRI 408",
+    "questions": [
+      { "id": "S7_Q1", "text": "How important is it for the company to have zero tolerance for child labour in its direct operations?" },
+      { "id": "S7_Q2", "text": "How significant is the risk of child labour occurring in this company's supply chain, especially in raw material sourcing?" },
+      { "id": "S7_Q3", "text": "How material is supplier auditing for child labour compliance to the company's overall ethical standing?" },
+      { "id": "S7_Q4", "text": "How critical is the company's commitment to eliminating child labour to maintaining investor and customer trust?" },
+      { "id": "S7_Q5", "text": "How important is it for the company to publicly disclose its child labour risk assessment and mitigation measures?" }
+    ]
+  },
+  {
+    "code": "S8",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Forced Labour",
+    "description": "Elimination of all forms of forced, compulsory, bonded, and trafficked labour in operations and supply chains.",
+    "griReference": "GRI 409",
+    "questions": [
+      { "id": "S8_Q1", "text": "How important is it for the company to ensure no worker is subject to forced, bonded, or trafficked labour?" },
+      { "id": "S8_Q2", "text": "How significant is the risk of forced labour occurring in the company's extended supply chain?" },
+      { "id": "S8_Q3", "text": "How material is ethical recruitment (no recruitment fees, transparent contracts) to the company's labour standards?" },
+      { "id": "S8_Q4", "text": "How critical is the freedom of movement and right to resign for all workers at this company and its suppliers?" },
+      { "id": "S8_Q5", "text": "How important is it for this company to conduct due diligence on modern slavery risks across its supply chain?" }
+    ]
+  },
+  {
+    "code": "S9",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Community Development",
+    "description": "The company's positive social contributions to local communities through CSR, employment, and infrastructure support.",
+    "griReference": "GRI 413",
+    "questions": [
+      { "id": "S9_Q1", "text": "How important is it for the company to invest in the development of communities near its operations?" },
+      { "id": "S9_Q2", "text": "How significant is the company's CSR spending in addressing local social needs (education, health, livelihoods)?" },
+      { "id": "S9_Q3", "text": "How material is community consultation and consent before the company undertakes new projects or expansions?" },
+      { "id": "S9_Q4", "text": "How critical is the company's community relations to its ability to operate without social conflict or disruption?" },
+      { "id": "S9_Q5", "text": "How important is transparent reporting of community development outcomes to your view of this company's social impact?" }
+    ]
+  },
+  {
+    "code": "S10",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Local Employment",
+    "description": "Preference for hiring from local communities and contribution to local economic development through employment.",
+    "griReference": "GRI 202",
+    "questions": [
+      { "id": "S10_Q1", "text": "How important is it for the company to prioritise hiring from local communities near its operations?" },
+      { "id": "S10_Q2", "text": "How significant is local employment creation to the company's positive social impact in its operating regions?" },
+      { "id": "S10_Q3", "text": "How material is the percentage of local workers in senior management to the company's social responsibility?" },
+      { "id": "S10_Q4", "text": "How critical is providing apprenticeships and vocational training for local youth to the company's community commitment?" },
+      { "id": "S10_Q5", "text": "How important is it for the company to disclose what proportion of its workforce comes from local communities?" }
+    ]
+  },
+  {
+    "code": "S11",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Product Safety",
+    "description": "Ensuring products and services are safe for consumers, meet quality standards, and comply with safety regulations.",
+    "griReference": "GRI 416",
+    "questions": [
+      { "id": "S11_Q1", "text": "How important is it for the company to ensure all its products meet relevant safety standards and certifications?" },
+      { "id": "S11_Q2", "text": "How significant is product recall risk or safety incidents to the company's financial and reputational standing?" },
+      { "id": "S11_Q3", "text": "How material is post-market safety surveillance and customer feedback management to the company's product responsibility?" },
+      { "id": "S11_Q4", "text": "How critical is transparent product labelling (ingredients, hazards, usage warnings) to customer safety?" },
+      { "id": "S11_Q5", "text": "How important is it for the company to disclose product safety incidents and corrective actions in its sustainability report?" }
+    ]
+  },
+  {
+    "code": "S12",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Customer Privacy",
+    "description": "Protection of customer personal data, compliance with data privacy regulations, and prevention of data breaches.",
+    "griReference": "GRI 418",
+    "questions": [
+      { "id": "S12_Q1", "text": "How important is it for the company to protect customer personal data from unauthorised access or misuse?" },
+      { "id": "S12_Q2", "text": "How significant is a customer data breach as a financial and reputational risk to this company?" },
+      { "id": "S12_Q3", "text": "How material is compliance with data privacy laws (e.g. DPDP Act in India, GDPR) to the company's operations?" },
+      { "id": "S12_Q4", "text": "How critical is customer consent and transparency in data collection to maintaining customer trust?" },
+      { "id": "S12_Q5", "text": "How important is it for the company to disclose its data privacy practices and any incidents of data breaches?" }
+    ]
+  },
+  {
+    "code": "S13",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Responsible Marketing",
+    "description": "Ethical communication practices, accurate advertising, and avoidance of misleading or harmful marketing to vulnerable groups.",
+    "griReference": "GRI 417",
+    "questions": [
+      { "id": "S13_Q1", "text": "How important is it for the company to ensure all its marketing and advertising claims are accurate and not misleading?" },
+      { "id": "S13_Q2", "text": "How significant is the risk of greenwashing (false environmental claims) to the company's credibility?" },
+      { "id": "S13_Q3", "text": "How material is ethical marketing to children and vulnerable populations to the company's social responsibility?" },
+      { "id": "S13_Q4", "text": "How critical is compliance with advertising standards and consumer protection regulations to the company's legal standing?" },
+      { "id": "S13_Q5", "text": "How important is it for the company to have a formal process for handling customer complaints about its marketing practices?" }
+    ]
+  },
+  {
+    "code": "S14",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Supply Chain Labour Practices",
+    "description": "Ensuring fair labour standards, safe working conditions, and ethical practices across all tiers of the supply chain.",
+    "griReference": "GRI 414",
+    "questions": [
+      { "id": "S14_Q1", "text": "How important is it for the company to screen and audit suppliers for compliance with fair labour standards?" },
+      { "id": "S14_Q2", "text": "How significant is the risk of poor labour practices in the company's supply chain affecting its reputation?" },
+      { "id": "S14_Q3", "text": "How material is supplier capacity building (training, standards support) to improving supply chain labour conditions?" },
+      { "id": "S14_Q4", "text": "How critical is it for the company to terminate contracts with suppliers found to violate labour rights?" },
+      { "id": "S14_Q5", "text": "How important is it for the company to disclose its supply chain labour risk assessment methodology and findings?" }
+    ]
+  },
+  {
+    "code": "S15",
+    "pillar": "Social",
+    "pillarCode": "S",
+    "topic": "Stakeholder Engagement",
+    "description": "Quality, frequency, and inclusiveness of the company's engagement with all key stakeholder groups.",
+    "griReference": "GRI 2 (2021)",
+    "questions": [
+      { "id": "S15_Q1", "text": "How important is it for the company to regularly engage with all key stakeholder groups to understand their concerns?" },
+      { "id": "S15_Q2", "text": "How significant is meaningful stakeholder consultation to the quality of the company's ESG strategy and decisions?" },
+      { "id": "S15_Q3", "text": "How material is the company's responsiveness to stakeholder feedback to maintaining long-term relationships and trust?" },
+      { "id": "S15_Q4", "text": "How critical is inclusive engagement (reaching marginalised communities, small suppliers, contract workers) to a fair process?" },
+      { "id": "S15_Q5", "text": "How important is it for the company to publicly report on outcomes from its stakeholder engagement activities?" }
+    ]
+  },
+  {
+    "code": "G1",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Business Ethics",
+    "description": "Company-wide commitment to ethical conduct, code of ethics, whistleblower protection, and a culture of integrity.",
+    "griReference": "GRI 2 (2021), GRI 205",
+    "questions": [
+      { "id": "G1_Q1", "text": "How important is it for the company to have a clearly communicated and enforced code of business ethics?" },
+      { "id": "G1_Q2", "text": "How significant are unethical business practices (fraud, misconduct) as a reputational and financial risk?" },
+      { "id": "G1_Q3", "text": "How material is a well-functioning whistleblower protection policy to the company's ethical culture?" },
+      { "id": "G1_Q4", "text": "How critical is regular ethics training for all employees to preventing misconduct?" },
+      { "id": "G1_Q5", "text": "How important is it for the company to disclose ethics violations and disciplinary actions in its annual report?" }
+    ]
+  },
+  {
+    "code": "G2",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Anti-Corruption",
+    "description": "Policies and practices to prevent bribery, corruption, facilitation payments, and conflicts of interest.",
+    "griReference": "GRI 205",
+    "questions": [
+      { "id": "G2_Q1", "text": "How important is it for the company to have zero-tolerance anti-bribery and anti-corruption policies?" },
+      { "id": "G2_Q2", "text": "How significant is corruption risk in the sectors and geographies where this company operates?" },
+      { "id": "G2_Q3", "text": "How material is due diligence on business partners and agents for corruption risks to the company's governance?" },
+      { "id": "G2_Q4", "text": "How critical is the company's conflict of interest disclosure policy to its governance integrity?" },
+      { "id": "G2_Q5", "text": "How important is it for the company to publicly report on anti-corruption training coverage and any confirmed incidents?" }
+    ]
+  },
+  {
+    "code": "G3",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Regulatory Compliance",
+    "description": "Adherence to applicable laws, regulations, and standards across all jurisdictions of operation.",
+    "griReference": "GRI 2 (2021), GRI 307",
+    "questions": [
+      { "id": "G3_Q1", "text": "How important is it for the company to maintain full compliance with all applicable environmental, labour, and corporate laws?" },
+      { "id": "G3_Q2", "text": "How significant are regulatory fines, penalties, or sanctions as a financial risk to this company?" },
+      { "id": "G3_Q3", "text": "How material is a proactive compliance management system (monitoring, training, audits) to the company's governance?" },
+      { "id": "G3_Q4", "text": "How critical is the company's responsiveness to regulatory changes to its operational and legal continuity?" },
+      { "id": "G3_Q5", "text": "How important is it for the company to disclose all significant regulatory non-compliance incidents and their resolution?" }
+    ]
+  },
+  {
+    "code": "G4",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Risk Management",
+    "description": "Enterprise-wide identification, assessment, and management of material risks including ESG, financial, and operational risks.",
+    "griReference": "GRI 2 (2021)",
+    "questions": [
+      { "id": "G4_Q1", "text": "How important is it for the company to have a comprehensive enterprise risk management (ERM) framework?" },
+      { "id": "G4_Q2", "text": "How significant is inadequate risk identification as a threat to the company's long-term performance?" },
+      { "id": "G4_Q3", "text": "How material is the integration of ESG risks into the company's overall risk register and board-level discussions?" },
+      { "id": "G4_Q4", "text": "How critical is regular risk assessment and scenario planning to the company's strategic resilience?" },
+      { "id": "G4_Q5", "text": "How important is it for the company to publicly disclose its top material risks and mitigation strategies?" }
+    ]
+  },
+  {
+    "code": "G5",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Board Governance",
+    "description": "Effectiveness, independence, diversity, and accountability of the board of directors in overseeing company strategy and ESG.",
+    "griReference": "GRI 2 (2021)",
+    "questions": [
+      { "id": "G5_Q1", "text": "How important is it for the company's board to include independent directors with ESG expertise?" },
+      { "id": "G5_Q2", "text": "How significant is board-level oversight of ESG risks and opportunities to effective sustainability governance?" },
+      { "id": "G5_Q3", "text": "How material is board diversity (gender, expertise, background) to the quality of corporate decision-making?" },
+      { "id": "G5_Q4", "text": "How critical is executive compensation being linked to ESG performance targets?" },
+      { "id": "G5_Q5", "text": "How important is transparent board composition and meeting attendance disclosure to investor confidence?" }
+    ]
+  },
+  {
+    "code": "G6",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Transparency & Disclosure",
+    "description": "Quality, completeness, and reliability of the company's public ESG disclosures and sustainability reporting.",
+    "griReference": "GRI 2 (2021)",
+    "questions": [
+      { "id": "G6_Q1", "text": "How important is it for the company to publish a comprehensive, GRI-aligned sustainability report annually?" },
+      { "id": "G6_Q2", "text": "How significant is the quality and reliability of ESG data to your assessment of this company's performance?" },
+      { "id": "G6_Q3", "text": "How material is third-party assurance of the company's sustainability report to its credibility?" },
+      { "id": "G6_Q4", "text": "How critical is timely and accurate ESG disclosure to maintaining investor and stakeholder trust?" },
+      { "id": "G6_Q5", "text": "How important is it for the company to disclose both positive achievements and areas of underperformance in its ESG report?" }
+    ]
+  },
+  {
+    "code": "G7",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "ESG Integration",
+    "description": "The degree to which ESG considerations are embedded in corporate strategy, business planning, and executive decision-making.",
+    "griReference": "GRI 2 (2021)",
+    "questions": [
+      { "id": "G7_Q1", "text": "How important is it for ESG goals to be formally integrated into the company's business strategy and annual planning?" },
+      { "id": "G7_Q2", "text": "How significant is the absence of ESG integration as a long-term competitiveness and investor risk?" },
+      { "id": "G7_Q3", "text": "How material is having a dedicated ESG/sustainability team with board-level access to the quality of ESG management?" },
+      { "id": "G7_Q4", "text": "How critical is ESG performance tracking (KPIs, dashboards) to the company's governance and accountability?" },
+      { "id": "G7_Q5", "text": "How important is ESG integration to the company's ability to attract long-term institutional investors?" }
+    ]
+  },
+  {
+    "code": "G8",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Responsible Procurement",
+    "description": "Integration of ESG criteria into supplier selection, evaluation, and ongoing supply chain management.",
+    "griReference": "GRI 2 (2021), GRI 308, GRI 414",
+    "questions": [
+      { "id": "G8_Q1", "text": "How important is it for the company to include ESG criteria when selecting and evaluating suppliers?" },
+      { "id": "G8_Q2", "text": "How significant is reputational risk from suppliers with poor ESG practices to this company's brand?" },
+      { "id": "G8_Q3", "text": "How material is preferential procurement from local, small, or diverse suppliers to the company's social responsibility?" },
+      { "id": "G8_Q4", "text": "How critical is supplier ESG auditing and corrective action follow-up to the company's overall sustainability performance?" },
+      { "id": "G8_Q5", "text": "How important is it for the company to disclose its responsible procurement policy and supplier screening results?" }
+    ]
+  },
+  {
+    "code": "G9",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Cybersecurity",
+    "description": "Protection of company and stakeholder data from cyber threats, data breaches, and IT system vulnerabilities.",
+    "griReference": "GRI 418",
+    "questions": [
+      { "id": "G9_Q1", "text": "How important is it for the company to have a robust cybersecurity framework to protect its IT systems and data?" },
+      { "id": "G9_Q2", "text": "How significant is a major cyber incident (breach, ransomware) as an operational and financial risk to this company?" },
+      { "id": "G9_Q3", "text": "How material is employee cybersecurity training and awareness to reducing the company's cyber risk?" },
+      { "id": "G9_Q4", "text": "How critical is board-level oversight of cybersecurity risk to the company's governance?" },
+      { "id": "G9_Q5", "text": "How important is it for the company to disclose its cybersecurity governance practices and any material incidents?" }
+    ]
+  },
+  {
+    "code": "G10",
+    "pillar": "Governance",
+    "pillarCode": "G",
+    "topic": "Tax Transparency",
+    "description": "Ethical tax practices, country-by-country reporting, and avoidance of aggressive tax planning strategies.",
+    "griReference": "GRI 207",
+    "questions": [
+      { "id": "G10_Q1", "text": "How important is it for the company to pay its fair share of taxes in every jurisdiction where it operates?" },
+      { "id": "G10_Q2", "text": "How significant is aggressive tax avoidance as a reputational and ethical risk for this company?" },
+      { "id": "G10_Q3", "text": "How material is country-by-country tax reporting to the transparency and accountability of this company?" },
+      { "id": "G10_Q4", "text": "How critical is tax strategy alignment with the company's stated values and ESG commitments?" },
+      { "id": "G10_Q5", "text": "How important is it for the company to publicly disclose its tax governance policy and effective tax rate?" }
+    ]
+  }
+]
