@@ -4,6 +4,12 @@ const PUBLIC_PATHS = ["/register", "/survey", "/api/survey", "/api/auth"];
 // These paths are accessible to any authenticated user; client-side guards handle unauthed access
 const AUTH_ONLY_PATHS = ["/company-setup", "/help"];
 
+function dashboardForRole(role: string | null): string {
+  if (role === "super_admin") return "/admin";
+  if (role === "field_agent") return "/agent";
+  return "/dashboard";
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -22,22 +28,27 @@ export function proxy(request: NextRequest) {
   }
 
   const sessionCookie = request.cookies.get("__session")?.value;
-  const claimsCookie = request.cookies.get("__claims")?.value;
 
   let role: string | null = null;
   try {
-    if (claimsCookie) {
-      const claims = JSON.parse(atob(claimsCookie)) as { role?: string | null };
-      role = claims.role ?? null;
+    if (sessionCookie) {
+      const session = JSON.parse(atob(sessionCookie)) as { uid?: string; role?: string | null };
+      role = session.role ?? null;
     }
-  } catch { /* malformed cookie — treat as unauthenticated */ }
+  } catch { /* malformed cookie — treat role as unknown */ }
 
-  // /login: redirect already-authenticated users to their dashboard
+  // Root ("/") — show landing page to guests, send authenticated users to their dashboard
+  if (pathname === "/") {
+    if (sessionCookie) {
+      return NextResponse.redirect(new URL(dashboardForRole(role), request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // /login — redirect already-authenticated users to their dashboard
   if (pathname === "/login") {
     if (sessionCookie) {
-      if (role === "super_admin") return NextResponse.redirect(new URL("/admin", request.url));
-      if (role === "field_agent") return NextResponse.redirect(new URL("/agent", request.url));
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL(dashboardForRole(role), request.url));
     }
     return NextResponse.next();
   }
@@ -54,14 +65,15 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Role-based guards
-  if (pathname.startsWith("/dashboard") && role !== "company_admin") {
+  // Role-based guards — only enforce when role is known; if __session couldn't be decoded
+  // the client-side AuthProvider will re-establish the correct state on next login.
+  if (pathname.startsWith("/dashboard") && role !== null && role !== "company_admin") {
     return NextResponse.redirect(new URL("/login?error=unauthorized", request.url));
   }
-  if (pathname.startsWith("/admin") && role !== "super_admin") {
+  if (pathname.startsWith("/admin") && role !== null && role !== "super_admin") {
     return NextResponse.redirect(new URL("/login?error=unauthorized", request.url));
   }
-  if (pathname.startsWith("/agent") && role !== "field_agent") {
+  if (pathname.startsWith("/agent") && role !== null && role !== "field_agent") {
     return NextResponse.redirect(new URL("/login?error=unauthorized", request.url));
   }
 

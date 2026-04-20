@@ -71,14 +71,13 @@ function clampReminderNumber(n: number): 1 | 2 | 3 {
 export async function POST(request: NextRequest): Promise<Response> {
   try {
     // ── Auth ──────────────────────────────────────────────────────────────────
-    const sessionUid = request.cookies.get("__session")?.value;
-    const claimsRaw = request.cookies.get("__claims")?.value;
+    const sessionRaw = request.cookies.get("__session")?.value;
 
-    if (!sessionUid || !claimsRaw) {
+    if (!sessionRaw) {
       return errRes("unauthorized", "Authentication required.", 401);
     }
 
-    const claims = parseClaims(claimsRaw);
+    const claims = parseClaims(sessionRaw);
     if (!claims || claims.role !== "company_admin") {
       return errRes("forbidden", "Company admin access required.", 403);
     }

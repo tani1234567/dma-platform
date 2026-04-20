@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AlertCircle, ChevronDown, ChevronUp, Download, RefreshCw } from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, Download, RefreshCw, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   getAssessment,
@@ -68,9 +68,23 @@ interface TypeBreakdown {
   type: string;
   total: number;
   responded: number;
+  proxyCount: number;
   pendingIds: string[];
   uninvitedIds: string[];
   rate: number;
+}
+
+interface ProxyRow {
+  responseId:      string;
+  stakeholderName: string;
+  stakeholderType: string;
+  organisation:    string;
+  agentName:       string;
+  topicsRated:     number;
+  avgImpact:       number;
+  avgFinancial:    number;
+  avgCombined:     number;
+  submittedAt:     string;
 }
 
 interface PillarStat {
@@ -109,6 +123,122 @@ function rateBarClass(rate: number): string {
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
+
+interface RespondentDetail {
+  stakeholderId: string;
+  stakeholderName: string;
+  stakeholderType: string;
+  impact: number;
+  financial: number;
+  isProxySubmission: boolean;
+  proxyAgentName?: string;
+}
+
+function RespondentPopover({
+  companyId,
+  fyId,
+  topicCode,
+  count,
+}: {
+  companyId: string;
+  fyId: string;
+  topicCode: string;
+  count: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const [respondents, setRespondents] = useState<RespondentDetail[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [position, setPosition] = useState({ top: 0, right: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open || respondents.length > 0) return;
+    setLoading(true);
+    fetch(
+      `/api/results/respondents?companyId=${companyId}&fyId=${fyId}&topicCode=${topicCode}`
+    )
+      .then((r) => r.json())
+      .then((d) => {
+        if ("respondents" in d) setRespondents(d.respondents);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [open, companyId, fyId, topicCode, respondents.length]);
+
+  useEffect(() => {
+    if (open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.top - 12,
+        right: window.innerWidth - rect.right,
+      });
+    }
+  }, [open]);
+
+  return (
+    <div className="relative inline-block">
+      <button
+        ref={buttonRef}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        className="inline-flex items-center gap-1 text-gray-700 hover:text-gray-900 cursor-help"
+      >
+        <Users size={14} className="text-gray-400" />
+        {count}
+      </button>
+
+      {open && (
+        <div
+          className="fixed w-56 bg-white border border-border rounded-lg shadow-lg z-[100] p-3"
+          style={{ top: position.top, right: position.right }}
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+        >
+          <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+            Respondents ({count})
+          </p>
+          {loading ? (
+            <p className="text-xs text-muted-foreground">Loading…</p>
+          ) : respondents.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No respondents found.</p>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {respondents.map((r) => (
+                <div
+                  key={r.stakeholderId}
+                  className="p-2 bg-gray-50 rounded text-xs border border-gray-200"
+                >
+                  <div className="flex items-start justify-between gap-1 mb-0.5">
+                    <p className="font-medium text-gray-900 leading-tight">{r.stakeholderName}</p>
+                    {r.isProxySubmission && (
+                      <span className="text-[9px] font-bold text-[#333a8b] bg-[#eff2ff] px-1.5 py-0.5 rounded-full shrink-0">
+                        Proxy
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-gray-500 text-[10px]">
+                    {r.stakeholderType}
+                    {r.isProxySubmission && r.proxyAgentName && (
+                      <span className="text-gray-400"> · via {r.proxyAgentName}</span>
+                    )}
+                  </p>
+                  <div className="flex gap-3 mt-1">
+                    <span className="text-gray-700">
+                      Impact: <span className="font-semibold">{r.impact.toFixed(2)}</span>
+                    </span>
+                    <span className="text-gray-700">
+                      Financial: <span className="font-semibold">{r.financial.toFixed(2)}</span>
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Skeleton({ className }: { className?: string }) {
   return <div className={cn("bg-gray-100 animate-pulse rounded-xl", className)} />;
@@ -173,6 +303,7 @@ export default function ResultsPage() {
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
   const [topicMap, setTopicMap] = useState<Map<string, GRITopic>>(new Map());
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [recalculating, setRecalculating] = useState(false);
   const [remindingType, setRemindingType] = useState<string | null>(null);
   const [sendingInvites, setSendingInvites] = useState(false);
@@ -181,6 +312,8 @@ export default function ResultsPage() {
   const [toast, setToast] = useState<{ msg: string; error?: boolean } | null>(null);
 
   const [breakdownOpen, setBreakdownOpen] = useState(true);
+  const [proxySubmissions, setProxySubmissions] = useState<ProxyRow[]>([]);
+  const [proxyLoading, setProxyLoading] = useState(false);
   const [sortCol, setSortCol] = useState<SortCol>("combined");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
@@ -192,25 +325,31 @@ export default function ResultsPage() {
   const [highlightedTopic, setHighlightedTopic] = useState<string | null>(null);
 
   // ── Load data ─────────────────────────────────────────────────────────────
+  // Assessment is loaded first and isolated: a failure in getGRITopics()
+  // (e.g. missing composite index) must not mask a valid, launched assessment.
 
   useEffect(() => {
     if (authLoading || !companyId) return;
-    Promise.all([
-      getAssessment(companyId, fyId),
-      getScores(companyId, fyId),
-      getStakeholders(companyId, fyId),
-      getGRITopics(),
-    ])
-      .then(([a, s, sh, topics]) => {
+
+    getAssessment(companyId, fyId)
+      .then((a) => {
+        if (!a) { setLoadError(true); setLoading(false); return; }
         setAssessment(a);
-        setScores(s);
-        setStakeholders(sh);
-        const map = new Map<string, GRITopic>();
-        for (const t of topics) map.set(t.code, t);
-        setTopicMap(map);
+
+        // Secondary data — failures are non-fatal
+        Promise.all([
+          getScores(companyId, fyId).catch(() => null),
+          getStakeholders(companyId, fyId).catch(() => []),
+          getGRITopics().catch(() => []),
+        ]).then(([s, sh, topics]) => {
+          setScores(s);
+          setStakeholders(sh as Stakeholder[]);
+          const map = new Map<string, GRITopic>();
+          for (const t of (topics as GRITopic[])) map.set(t.code, t);
+          setTopicMap(map);
+        }).finally(() => setLoading(false));
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch(() => { setLoadError(true); setLoading(false); });
   }, [authLoading, companyId, fyId]);
 
   useEffect(() => {
@@ -218,6 +357,16 @@ export default function ResultsPage() {
     const t = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    if (!companyId || !fyId) return;
+    setProxyLoading(true);
+    fetch(`/api/results/proxy-submissions?companyId=${companyId}&fyId=${fyId}`)
+      .then(r => r.json())
+      .then(d => { if (d.proxySubmissions) setProxySubmissions(d.proxySubmissions); })
+      .catch(() => {})
+      .finally(() => setProxyLoading(false));
+  }, [companyId, fyId]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
@@ -425,11 +574,13 @@ export default function ResultsPage() {
     const map = new Map<string, TypeBreakdown>();
     for (const s of stakeholders) {
       if (!map.has(s.type))
-        map.set(s.type, { type: s.type, total: 0, responded: 0, pendingIds: [], uninvitedIds: [], rate: 0 });
+        map.set(s.type, { type: s.type, total: 0, responded: 0, proxyCount: 0, pendingIds: [], uninvitedIds: [], rate: 0 });
       const e = map.get(s.type)!;
       e.total++;
-      if (s.status === SurveyTokenStatus.COMPLETED) e.responded++;
-      else if (s.status === SurveyTokenStatus.SENT || s.status === SurveyTokenStatus.OPENED)
+      if (s.status === SurveyTokenStatus.COMPLETED) {
+        e.responded++;
+        if (s.isProxySubmission) e.proxyCount++;
+      } else if (s.status === SurveyTokenStatus.SENT || s.status === SurveyTokenStatus.OPENED)
         e.pendingIds.push(s.id);
       else if (s.status === SurveyTokenStatus.PENDING)
         e.uninvitedIds.push(s.id);
@@ -472,12 +623,14 @@ export default function ResultsPage() {
       .filter(code => scores.topicScores[code])
       .map(code => ({
         code,
+        topicName: topicMap.get(code)?.name ?? "",
         Impact:    scores.topicScores[code].impactScore,
         Financial: scores.topicScores[code].financialScore,
       }));
-  }, [scores, chartFilter, selectedTopics]);
+  }, [scores, chartFilter, selectedTopics, topicMap]);
 
-  const totalUninvited = typeBreakdown.reduce((sum, row) => sum + row.uninvitedIds.length, 0);
+  const totalUninvited  = typeBreakdown.reduce((sum, row) => sum + row.uninvitedIds.length, 0);
+  const totalProxyCount = typeBreakdown.reduce((sum, row) => sum + row.proxyCount, 0);
   const topicsAssessed = scores ? Object.keys(scores.topicScores).length : 0;
   const criticalCount  = scores
     ? Object.values(scores.topicScores).filter(s => s.quadrant === "critical").length
@@ -496,6 +649,16 @@ export default function ResultsPage() {
         <Skeleton className="h-96" />
         <div className="grid grid-cols-3 gap-4">
           {[...Array<number>(3)].map((_, i) => <Skeleton key={i} className="h-44" />)}
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="p-8">
+        <div className="rounded-md bg-red-50 border border-red-200 px-5 py-4 text-sm text-red-700">
+          Failed to load assessment data. Please refresh the page.
         </div>
       </div>
     );
@@ -531,9 +694,14 @@ export default function ResultsPage() {
             Response Rate
           </p>
           <p className={cn("text-3xl font-bold mb-0.5", rateTextClass(pct))}>{pct}%</p>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-sm text-muted-foreground mb-2">
             {responseCount} of {totalCount} response{totalCount !== 1 ? "s" : ""}
           </p>
+          {totalProxyCount > 0 && (
+            <p className="text-xs font-medium text-[#333a8b] bg-[#eff2ff] rounded-full px-2 py-0.5 inline-block mb-2">
+              {totalProxyCount} via agent proxy
+            </p>
+          )}
           <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
             {responseCount === 0 ? (
               <div className="h-2 w-full rounded-full bg-gray-200 animate-pulse" />
@@ -656,7 +824,7 @@ export default function ResultsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  {["Type", "Added", "Responded", "Rate", "Progress", ""].map((h, i) => (
+                  {["Type", "Added", "Responded", "Via Proxy", "Rate", "Progress", ""].map((h, i) => (
                     <th
                       key={i}
                       className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
@@ -669,7 +837,7 @@ export default function ResultsPage() {
               <tbody className="divide-y divide-border">
                 {typeBreakdown.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-5 py-8 text-center text-sm text-muted-foreground">
+                    <td colSpan={7} className="px-5 py-8 text-center text-sm text-muted-foreground">
                       No stakeholders found.
                     </td>
                   </tr>
@@ -678,6 +846,15 @@ export default function ResultsPage() {
                     <td className="px-5 py-3 font-medium text-gray-900 whitespace-nowrap">{row.type}</td>
                     <td className="px-5 py-3 text-gray-600">{row.total}</td>
                     <td className="px-5 py-3 text-gray-600">{row.responded}</td>
+                    <td className="px-5 py-3">
+                      {row.proxyCount > 0 ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#333a8b] bg-[#eff2ff] px-2 py-0.5 rounded-full">
+                          {row.proxyCount}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-xs">—</span>
+                      )}
+                    </td>
                     <td className={cn("px-5 py-3 font-semibold", rateTextClass(row.rate))}>
                       {row.rate}%
                     </td>
@@ -716,6 +893,99 @@ export default function ResultsPage() {
           </div>
         )}
       </div>
+
+      {/* ── PROXY SUBMISSIONS TABLE ──────────────────────────────────────────── */}
+      {(proxyLoading || proxySubmissions.length > 0) && (
+        <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-900">Agent Proxy Submissions</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Surveys submitted by field agents on behalf of stakeholders
+              </p>
+            </div>
+            {!proxyLoading && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#eff2ff] text-[#333a8b]">
+                {proxySubmissions.length} submission{proxySubmissions.length !== 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
+
+          {proxyLoading ? (
+            <div className="p-6 space-y-3">
+              {[...Array<number>(3)].map((_, i) => (
+                <div key={i} className="h-10 bg-gray-100 animate-pulse rounded-lg" />
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-border">
+                  <tr>
+                    {["Stakeholder", "Organisation", "Submitted By", "Topics Rated", "Avg Impact", "Avg Financial", "Avg Combined", "Submitted At"].map((h) => (
+                      <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {proxySubmissions.map((row) => (
+                    <tr key={row.responseId} className="hover:bg-gray-50/50">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-[#eff2ff] flex items-center justify-center shrink-0">
+                            <span className="text-[10px] font-bold text-[#333a8b]">
+                              {row.stakeholderName.slice(0, 2).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900 leading-tight">{row.stakeholderName}</p>
+                            <span className="inline-block text-[10px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded mt-0.5">
+                              {row.stakeholderType}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-gray-600 text-xs">{row.organisation}</td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-[#333a8b]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#333a8b] shrink-0" />
+                          {row.agentName}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center text-gray-700 font-semibold tabular-nums">{row.topicsRated}</td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={cn("text-xs font-semibold tabular-nums", row.avgImpact >= 4 ? "text-green-700" : row.avgImpact >= 3 ? "text-amber-600" : "text-gray-600")}>
+                          {row.avgImpact.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={cn("text-xs font-semibold tabular-nums", row.avgFinancial >= 4 ? "text-green-700" : row.avgFinancial >= 3 ? "text-amber-600" : "text-gray-600")}>
+                          {row.avgFinancial.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={cn("text-xs font-bold tabular-nums", row.avgCombined >= 4 ? "text-green-700" : row.avgCombined >= 3 ? "text-amber-600" : "text-gray-600")}>
+                          {row.avgCombined.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                        {row.submittedAt
+                          ? new Intl.DateTimeFormat("en-GB", {
+                              day: "2-digit", month: "short", year: "numeric",
+                              hour: "2-digit", minute: "2-digit", hour12: false,
+                            }).format(new Date(row.submittedAt))
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── SECTIONS 3-5: Only shown once scores exist ────────────────────────── */}
       {scores && topicsAssessed > 0 && (
@@ -825,7 +1095,14 @@ export default function ResultsPage() {
                           <td className="px-4 py-3"><ScoreBar score={entry.score.financialScore} /></td>
                           <td className="px-4 py-3"><ScoreBar score={entry.score.combinedScore} /></td>
                           <td className="px-4 py-3"><QuadrantBadge quadrant={dynQuadrant} /></td>
-                          <td className="px-4 py-3 text-gray-700">{entry.score.respondentCount}</td>
+                          <td className="px-4 py-3">
+                            <RespondentPopover
+                              companyId={companyId}
+                              fyId={fyId}
+                              topicCode={entry.code}
+                              count={entry.score.respondentCount}
+                            />
+                          </td>
                         </tr>
 
                         {isExpanded && (
@@ -897,9 +1174,13 @@ export default function ResultsPage() {
                     contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e5e7eb" }}
                     content={({ active, payload, label }) => {
                       if (!active || !payload?.length) return null;
+                      const topicName = payload[0]?.payload?.topicName ?? "";
                       return (
                         <div className="bg-white border border-border rounded-lg shadow-md p-3">
-                          <p className="text-xs font-semibold text-gray-900 mb-2">{label}</p>
+                          <p className="text-xs font-semibold text-gray-900 mb-0.5">{label}</p>
+                          {topicName && (
+                            <p className="text-xs text-muted-foreground mb-2">{topicName}</p>
+                          )}
                           {payload.map((entry, i) => (
                             <p key={i} className="text-xs" style={{ color: entry.color }}>
                               {entry.name}:{" "}

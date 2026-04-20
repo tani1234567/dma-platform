@@ -1,0 +1,11 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_FIREBASE_API_KEY=${_FIREBASE_API_KEY}'
+      - '-t'
+      - 'gcr.io/swifora/dma-platform'
+      - '.'
+images:
+  - 'gcr.io/swifora/dma-platform'

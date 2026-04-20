@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,6 +53,8 @@ function LoginForm() {
   const { firebaseUser, userDoc: storeUserDoc, loading: authLoading } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Prevents the auth-state useEffect from racing the form submit redirect
+  const submittingRef = useRef(false);
 
   const {
     register,
@@ -60,13 +62,15 @@ function LoginForm() {
     formState: { errors },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
-  // Redirect already-authenticated users away from the login page
+  // Redirect already-authenticated users away from the login page (e.g. back-button).
+  // Skipped during form submission — onSubmit sets the session cookie first, then redirects.
   useEffect(() => {
-    if (authLoading || !firebaseUser || !storeUserDoc) return;
+    if (authLoading || !firebaseUser || !storeUserDoc || submittingRef.current) return;
     router.replace(roleRedirect(storeUserDoc.role, storeUserDoc.registrationComplete));
   }, [authLoading, firebaseUser, storeUserDoc, router]);
 
   async function onSubmit(data: FormValues) {
+    submittingRef.current = true;
     setLoading(true);
     setError(null);
     try {
@@ -101,6 +105,7 @@ function LoginForm() {
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code ?? "";
       setError(firebaseAuthError(code));
+      submittingRef.current = false; // re-enable auth-state redirect if login failed
     } finally {
       setLoading(false);
     }

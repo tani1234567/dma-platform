@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, Fragment } from "react";
-import { Check, X, Pencil } from "lucide-react";
+import Link from "next/link";
+import { Check, X, Pencil, MessageSquareText } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -119,6 +120,7 @@ export default function AdminTopicsPage() {
                   <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Questions</th>
                   <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Active</th>
                   <th className="text-right px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
+                  <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Edit Questions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -177,10 +179,20 @@ export default function AdminTopicsPage() {
                           </button>
                         )}
                       </td>
+                      <td className="px-4 py-3.5 text-center">
+                        <Link
+                          href={`/admin/topics/${t.code}/questions`}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-[#333a8b] bg-[#eff2ff] hover:bg-[#dde3ff] transition-colors"
+                          title={`Manage questions for ${t.code}`}
+                        >
+                          <MessageSquareText size={11} />
+                          {t.questionsCount}
+                        </Link>
+                      </td>
                     </tr>
                     {editingCode === t.code && (
                       <tr className="bg-[#eff2ff]/50">
-                        <td colSpan={6} className="px-5 py-3">
+                        <td colSpan={7} className="px-5 py-3">
                           <div className="flex flex-col sm:flex-row gap-3">
                             <div className="flex-1">
                               <label className="text-xs font-medium text-muted-foreground block mb-1">GRI Reference</label>

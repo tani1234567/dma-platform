@@ -12,8 +12,11 @@ RUN npm install --legacy-peer-deps
 # Copy application code
 COPY . .
 
-# Build Next.js
-RUN npm run build
+# Build arg for Firebase API key (baked into bundle at build time)
+ARG NEXT_PUBLIC_FIREBASE_API_KEY
+
+# Build Next.js with real Firebase config
+RUN NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY} npm run build
 
 # Stage 2: Runtime
 FROM node:20-alpine
@@ -24,7 +27,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production
+RUN npm install --legacy-peer-deps --omit=dev
 
 # Copy built app from builder stage
 COPY --from=builder /app/.next ./.next

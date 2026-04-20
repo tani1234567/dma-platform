@@ -12,22 +12,72 @@ function parseClaims(raw: string): { role: string; uid: string } | null {
   catch { return null; }
 }
 
+interface SurveyQuestion { id: string; text: string; }
+
 interface PatchTopicBody {
   isActive?: boolean;
   description?: string;
   griReference?: string;
+  questions?: SurveyQuestion[];
 }
 
-// ─── PATCH /api/admin/topics/[code] — edit description/griRef or toggle active ─
+// ─── Helper: resolve topic doc ref by code ────────────────────────────────────
+
+async function resolveTopicRef(code: string) {
+  const directRef = adminDb.collection("gri_topics").doc(code);
+  const directSnap = await directRef.get();
+  if (directSnap.exists) return { ref: directRef, snap: directSnap };
+  const q = await adminDb.collection("gri_topics").where("code", "==", code).limit(1).get();
+  if (q.empty) return null;
+  return { ref: q.docs[0].ref, snap: q.docs[0] };
+}
+
+// ─── GET /api/admin/topics/[code] — fetch single topic with full questions ────
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ code: string }> }
+): Promise<Response> {
+  const sessionRaw = request.cookies.get("__session")?.value;
+  if (!sessionRaw) return errRes("unauthorized", "Authentication required.", 401);
+  const claims = parseClaims(sessionRaw);
+  if (!claims || claims.role !== "super_admin") return errRes("forbidden", "Super admin required.", 403);
+
+  const { code } = await params;
+
+  try {
+    const result = await resolveTopicRef(code);
+    if (!result) return errRes("not_found", "Topic not found.", 404);
+
+    const data = result.snap.data() as Record<string, unknown>;
+    return Response.json({
+      topic: {
+        id:           result.snap.id,
+        code:         data.code        ?? code,
+        name:         data.name        ?? "",
+        pillar:       data.pillar      ?? "",
+        pillarCode:   data.pillarCode  ?? "",
+        griReference: data.griReference ?? "",
+        description:  data.description ?? "",
+        questions:    (data.questions as SurveyQuestion[]) ?? [],
+        isActive:     data.isActive    !== false,
+      },
+    });
+  } catch (error) {
+    console.error("[admin/topics/[code] GET]", error);
+    return Response.json({ error: "server_error", message: "Failed to fetch topic." }, { status: 500 });
+  }
+}
+
+// ─── PATCH /api/admin/topics/[code] — edit fields or replace questions ────────
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ): Promise<Response> {
-  const sessionUid = request.cookies.get("__session")?.value;
-  const claimsRaw  = request.cookies.get("__claims")?.value;
-  if (!sessionUid || !claimsRaw) return errRes("unauthorized", "Authentication required.", 401);
-  const claims = parseClaims(claimsRaw);
+  const sessionRaw = request.cookies.get("__session")?.value;
+  if (!sessionRaw) return errRes("unauthorized", "Authentication required.", 401);
+  const claims = parseClaims(sessionRaw);
   if (!claims || claims.role !== "super_admin") return errRes("forbidden", "Super admin required.", 403);
 
   const { code } = await params;
@@ -40,24 +90,21 @@ export async function PATCH(
   if (typeof body.isActive === "boolean")    update.isActive    = body.isActive;
   if (typeof body.description === "string")  update.description = body.description.trim();
   if (typeof body.griReference === "string") update.griReference = body.griReference.trim();
+  if (Array.isArray(body.questions)) {
+    // Validate and re-index question IDs as CODE_Q1, CODE_Q2, …
+    const cleaned: SurveyQuestion[] = body.questions
+      .filter((q): q is SurveyQuestion => typeof q?.text === "string" && q.text.trim().length > 0)
+      .map((q, i) => ({ id: `${code}_Q${i + 1}`, text: q.text.trim() }));
+    update.questions = cleaned;
+  }
 
   if (Object.keys(update).length === 1)
     return errRes("bad_request", "Nothing to update.", 400);
 
   try {
-    // Topics may be keyed by code or by auto-ID. Try by code first, then query.
-    const directRef = adminDb.collection("gri_topics").doc(code);
-    const directSnap = await directRef.get();
-
-    if (directSnap.exists) {
-      await directRef.update(update);
-    } else {
-      // Fall back: query by code field
-      const q = await adminDb.collection("gri_topics").where("code", "==", code).limit(1).get();
-      if (q.empty) return errRes("not_found", "Topic not found.", 404);
-      await q.docs[0].ref.update(update);
-    }
-
+    const result = await resolveTopicRef(code);
+    if (!result) return errRes("not_found", "Topic not found.", 404);
+    await result.ref.update(update);
     return Response.json({ success: true });
   } catch (error) {
     console.error("[admin/topics/[code] PATCH]", error);

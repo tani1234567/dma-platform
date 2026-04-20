@@ -24,10 +24,9 @@ interface GRITopicDoc {
 // ─── GET /api/admin/topics ────────────────────────────────────────────────────
 
 export async function GET(request: NextRequest): Promise<Response> {
-  const sessionUid = request.cookies.get("__session")?.value;
-  const claimsRaw  = request.cookies.get("__claims")?.value;
-  if (!sessionUid || !claimsRaw) return errRes("unauthorized", "Authentication required.", 401);
-  const claims = parseClaims(claimsRaw);
+  const sessionRaw = request.cookies.get("__session")?.value;
+  if (!sessionRaw) return errRes("unauthorized", "Authentication required.", 401);
+  const claims = parseClaims(sessionRaw);
   if (!claims || claims.role !== "super_admin") return errRes("forbidden", "Super admin required.", 403);
 
   try {

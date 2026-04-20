@@ -13,6 +13,9 @@ import {
   Users,
   BookOpen,
   ShieldCheck,
+  Briefcase,
+  UserCheck,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,10 +23,11 @@ import { getCompany } from "@/lib/firebase/firestore";
 import { UserRole } from "@/types";
 
 const companyNavItems = [
-  { label: "Dashboard",       href: "/dashboard",      icon: Home },
-  { label: "Assessments",     href: "/dashboard",      icon: ClipboardList },
-  { label: "Company Profile", href: "/company-setup",  icon: Building2 },
-  { label: "Help",            href: "/help",            icon: HelpCircle },
+  { label: "Dashboard",       href: "/dashboard",           icon: Home },
+  { label: "Assessments",     href: "/dashboard",           icon: ClipboardList },
+  { label: "Field Agents",    href: "/dashboard/agents",    icon: UserCog },
+  { label: "Company Profile", href: "/company-profile",     icon: Building2 },
+  { label: "Help",            href: "/help",                icon: HelpCircle },
 ];
 
 const adminNavItems = [
@@ -33,32 +37,37 @@ const adminNavItems = [
   { label: "GRI Topics",  href: "/admin/topics",     icon: BookOpen },
 ];
 
+const agentNavItems = [
+  { label: "Dashboard",    href: "/agent",              icon: LayoutDashboard },
+  { label: "Assignments",  href: "/agent/assignments",  icon: UserCheck },
+];
+
 export function Sidebar() {
   const pathname = usePathname();
   const { firebaseUser, userDoc, role, logout } = useAuth();
   const [companyName, setCompanyName] = useState<string | null>(null);
 
   const isSuperAdmin = role === UserRole.SUPER_ADMIN;
+  const isFieldAgent = role === UserRole.FIELD_AGENT;
 
   useEffect(() => {
-    if (isSuperAdmin || !firebaseUser?.uid) return;
+    if (isSuperAdmin || isFieldAgent || !firebaseUser?.uid) return;
     getCompany(firebaseUser.uid)
       .then((c) => { if (c) setCompanyName(c.name); })
       .catch(() => {});
-  }, [firebaseUser?.uid, isSuperAdmin]);
+  }, [firebaseUser?.uid, isSuperAdmin, isFieldAgent]);
 
-  const navItems = isSuperAdmin ? adminNavItems : companyNavItems;
+  const navItems = isSuperAdmin
+    ? adminNavItems
+    : isFieldAgent
+    ? agentNavItems
+    : companyNavItems;
 
   function isActive(href: string): boolean {
-    if (isSuperAdmin) {
-      // Exact match for /admin (overview), prefix for sub-pages
-      return href === "/admin"
-        ? pathname === "/admin"
-        : pathname === href || pathname.startsWith(href + "/");
-    }
-    return href === "/dashboard"
-      ? pathname === "/dashboard"
-      : pathname === href || pathname.startsWith(href + "/");
+    if (href === "/admin")       return pathname === "/admin";
+    if (href === "/agent")       return pathname === "/agent";
+    if (href === "/dashboard")   return pathname === "/dashboard";
+    return pathname === href || pathname.startsWith(href + "/");
   }
 
   return (
@@ -75,6 +84,18 @@ export function Sidebar() {
             </div>
             <p className="text-sm font-semibold text-[#333a8b] truncate">
               {userDoc?.displayName ?? "Admin"}
+            </p>
+          </>
+        ) : isFieldAgent ? (
+          <>
+            <div className="flex items-center gap-2 mb-1">
+              <Briefcase size={13} className="text-[#ff6900] shrink-0" />
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Field Agent
+              </p>
+            </div>
+            <p className="text-sm font-semibold text-[#333a8b] truncate">
+              {userDoc?.displayName ?? "Agent"}
             </p>
           </>
         ) : (

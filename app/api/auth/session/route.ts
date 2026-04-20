@@ -12,12 +12,16 @@ export async function POST(req: NextRequest) {
 
     const decoded = await adminAuth.verifyIdToken(idToken);
 
-    // Fetch role from Firestore — new users won't have JWT custom claims yet
-    let role: string | null = null;
+    // Resolve role: Firestore is authoritative; Firebase custom claims are fallback.
+    // This covers super-admins whose custom claims were set directly in the console.
+    let role: string | null = (decoded.role as string | undefined) ?? null;
     try {
       const snap = await adminDb.collection("users").doc(decoded.uid).get();
-      if (snap.exists) role = snap.data()?.role ?? null;
-    } catch { /* non-fatal */ }
+      if (snap.exists) {
+        const firestoreRole = snap.data()?.role ?? null;
+        if (firestoreRole) role = firestoreRole; // Firestore wins if present
+      }
+    } catch { /* non-fatal — keep custom-claims role */ }
 
     const cookieOpts = {
       maxAge: MAX_AGE,
@@ -28,14 +32,14 @@ export async function POST(req: NextRequest) {
     };
 
     const res = NextResponse.json({ success: true });
-    // __session: presence flag (uid stored — not security-sensitive, just for proxy checks)
-    res.cookies.set("__session", decoded.uid, cookieOpts);
-    // __claims: base64 role for proxy role-based routing
+    // __session: only cookie Firebase Hosting forwards to Cloud Run — encode uid + role here
     res.cookies.set(
-      "__claims",
-      Buffer.from(JSON.stringify({ role, uid: decoded.uid })).toString("base64"),
+      "__session",
+      Buffer.from(JSON.stringify({ uid: decoded.uid, role })).toString("base64"),
       cookieOpts
     );
+    // Clear any stale __claims cookie from previous deploys
+    res.cookies.set("__claims", "", { maxAge: 0, path: "/" });
     return res;
   } catch (err) {
     console.error("[session POST]", err);
@@ -46,6 +50,6 @@ export async function POST(req: NextRequest) {
 export async function DELETE() {
   const res = NextResponse.json({ success: true });
   res.cookies.set("__session", "", { maxAge: 0, path: "/" });
-  res.cookies.set("__claims", "", { maxAge: 0, path: "/" });
+  res.cookies.set("__claims", "", { maxAge: 0, path: "/" }); // clear legacy cookie
   return res;
 }

@@ -1,8 +1,16 @@
 {
   "hosting": {
-    "public": ".next",
+    "public": "public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [{ "source": "**", "destination": "/index.html" }]
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "dma-platform",
+          "region": "asia-south1"
+        }
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules",

@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Building2, ClipboardList, Users, BarChart3 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { PageShell } from "@/components/layout/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -57,27 +59,37 @@ function StatCard({ label, value, icon: Icon, color, bg }: StatCardProps) {
 }
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
+  const { loading: authLoading } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [activity, setActivity] = useState<ActivityItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     void fetch("/api/admin/stats")
-      .then(r => r.json())
-      .then((d: { totalCompanies: number; activeAssessments: number; totalResponses: number; totalStakeholders: number } | { error: string }) => {
+      .then(async (r) => {
+        if (r.status === 401) { router.replace("/login"); return; }
+        const d = await r.json() as { totalCompanies: number; activeAssessments: number; totalResponses: number; totalStakeholders: number } | { error: string };
         if ("error" in d) { setError("Failed to load stats."); return; }
         setStats(d);
       })
       .catch(() => setError("Failed to load stats."));
 
     void fetch("/api/admin/activity")
-      .then(r => r.json())
-      .then((d: { activity: ActivityItem[] } | { error: string }) => {
+      .then(async (r) => {
+        if (r.status === 401) return;
+        const d = await r.json() as { activity: ActivityItem[] } | { error: string };
         if ("error" in d) return;
         setActivity(d.activity);
       })
       .catch(() => {});
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading]);
 
   return (
     <PageShell

@@ -749,89 +749,58 @@ export default function CompanySetupPage() {
   const { firebaseUser } = useAuthStore();
   const store = useCompanyRegistrationStore();
 
-  const goNext = useCallback(() => {
-    store.setStep((store.step + 1) as 1 | 2 | 3);
-  }, [store]);
+  const goNext = useCallback(() => store.setStep((store.step + 1) as 1 | 2 | 3), [store]);
+  const goBack = useCallback(() => store.setStep((store.step - 1) as 1 | 2 | 3), [store]);
 
-  const goBack = useCallback(() => {
-    store.setStep((store.step - 1) as 1 | 2 | 3);
-  }, [store]);
-
-  async function handleFinalSubmit(
-    permanentEmployees: EmployeeTable,
-    contractEmployees: EmployeeTable
-  ) {
-    if (!firebaseUser || !store.basicInfo || !store.resources) {
-      throw new Error("Missing required data");
-    }
-
+  async function handleFinalSubmit(permanentEmployees: EmployeeTable, contractEmployees: EmployeeTable) {
+    if (!firebaseUser || !store.basicInfo || !store.resources) throw new Error("Missing required data");
     const uid = firebaseUser.uid;
-
-    // Upload logo if selected
     let logoURL: string | undefined;
-    if (store.logoFile) {
-      logoURL = await uploadCompanyLogo(uid, store.logoFile);
-    }
-
-    // Write company document
+    if (store.logoFile) logoURL = await uploadCompanyLogo(uid, store.logoFile);
     await upsertCompany(uid, {
-      adminUid: uid,
-      status: "active",
-      name: store.basicInfo.companyName,
-      cinNumber: store.basicInfo.cinNumber,
-      industry: store.basicInfo.industryType,
-      address: store.basicInfo.address,
-      country: "India",
-      manufacturingUnitLocation: store.basicInfo.manufacturingUnitLocation,
-      areaOfManufacturingUnit: store.basicInfo.areaOfManufacturingUnit,
-      areaUnit: store.basicInfo.areaUnit,
+      adminUid: uid, status: "active",
+      name:                          store.basicInfo.companyName,
+      cinNumber:                     store.basicInfo.cinNumber,
+      industry:                      store.basicInfo.industryType,
+      address:                       store.basicInfo.address,
+      country:                       "India",
+      manufacturingUnitLocation:     store.basicInfo.manufacturingUnitLocation,
+      areaOfManufacturingUnit:       store.basicInfo.areaOfManufacturingUnit,
+      areaUnit:                      store.basicInfo.areaUnit,
       logoURL,
-      totalWaterUsage_FY: store.resources.totalWaterUsage_FY,
-      totalElectricityConsumption_FY: store.resources.totalElectricityConsumption_FY,
-      totalFuelConsumption_FY: store.resources.totalFuelConsumption_FY,
-      fuelUnit: store.resources.fuelUnit,
+      totalWaterUsage_FY:            store.resources.totalWaterUsage_FY,
+      totalElectricityConsumption_FY:store.resources.totalElectricityConsumption_FY,
+      totalFuelConsumption_FY:       store.resources.totalFuelConsumption_FY,
+      fuelUnit:                      store.resources.fuelUnit,
       permanentEmployees,
       contractEmployees,
     });
-
-    // Mark user's registration as complete and link companyId
-    await updateUserDocument(uid, {
-      registrationComplete: true,
-      companyId: uid,
-    });
-
+    await updateUserDocument(uid, { registrationComplete: true, companyId: uid });
     store.reset();
     router.push("/dashboard");
   }
 
   const STEP_TITLES: Record<1 | 2 | 3, { title: string; description: string }> = {
-    1: { title: "Basic Information", description: "Tell us about your company" },
+    1: { title: "Basic Information",    description: "Tell us about your company" },
     2: { title: "Resource Consumption", description: "Last financial year data" },
-    3: { title: "Employee Data", description: "Headcount breakdown by age group" },
+    3: { title: "Employee Data",        description: "Headcount breakdown by age group" },
   };
 
   const { title, description } = STEP_TITLES[store.step];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
-      {/* Page header */}
       <div className="mb-8 text-center">
-        <p className="text-sm text-[#ff6900] font-semibold uppercase tracking-wide mb-1">
-          Company Setup
-        </p>
+        <p className="text-sm text-[#ff6900] font-semibold uppercase tracking-wide mb-1">Company Setup</p>
         <h1 className="text-2xl font-bold text-[#333a8b]">{title}</h1>
         <p className="text-sm text-muted-foreground mt-1">{description}</p>
       </div>
-
       <StepIndicator current={store.step} />
-
       <Card className="shadow-sm">
         <CardContent className="pt-6 pb-8 px-6 sm:px-8">
           {store.step === 1 && <Step1BasicInfo onNext={goNext} />}
           {store.step === 2 && <Step2Resources onNext={goNext} onBack={goBack} />}
-          {store.step === 3 && (
-            <Step3Employees onBack={goBack} onSubmit={handleFinalSubmit} />
-          )}
+          {store.step === 3 && <Step3Employees onBack={goBack} onSubmit={handleFinalSubmit} />}
         </CardContent>
       </Card>
     </div>
