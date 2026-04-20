@@ -421,8 +421,8 @@ export default function CompanyProfilePage() {
             totalFuelConsumption_FY:        company.totalFuelConsumption_FY || 0,
             fuelUnit:                       (company.fuelUnit as FuelUnit) || "litres",
           });
-          store.setPermanentEmployees(company.permanentEmployees || defaultEmployeeTable);
-          store.setContractEmployees(company.contractEmployees   || defaultEmployeeTable);
+          store.setPermanentEmployees(company.permanentEmployees || defaultEmployeeTable());
+          store.setContractEmployees(company.contractEmployees   || defaultEmployeeTable());
         }
       })
       .finally(() => setLoading(false));
