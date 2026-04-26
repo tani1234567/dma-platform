@@ -124,16 +124,19 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <Image
-        src="/DMA_logo.png"
-        alt="DMA Platform Logo"
-        width={120}
-        height={120}
-        className="rounded-[20px]"
-        priority
-      />
-      <Card className="shadow-sm w-full">
+    <div className="relative">
+      <div className="absolute top-6 right-6 z-20">
+        <Image
+          src="/DMA_logo.png"
+          alt="DMA Platform Logo"
+          width={70}
+          height={70}
+          className="rounded-[12px]"
+          priority
+        />
+      </div>
+      <div className="flex flex-col items-center gap-6">
+        <Card className="shadow-sm w-full">
         <CardHeader className="pb-4">
           <CardTitle className="text-xl text-[#333a8b]">Welcome back</CardTitle>
           <CardDescription>Sign in to your Swifora account</CardDescription>
@@ -204,6 +207,7 @@ function LoginForm() {
         </div>
       </CardContent>
     </Card>
+      </div>
     </div>
   );
 }
