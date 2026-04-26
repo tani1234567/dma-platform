@@ -9,15 +9,15 @@ export interface BasicInfoData {
   industryType: string;
   address: string;
   manufacturingUnitLocation: string;
-  areaOfManufacturingUnit: number;
-  areaUnit: AreaUnit;
+  areaOfManufacturingUnit?: number;
+  areaUnit?: AreaUnit;
 }
 
 export interface ResourcesData {
-  totalWaterUsage_FY: number;
-  totalElectricityConsumption_FY: number;
-  totalFuelConsumption_FY: number;
-  fuelUnit: FuelUnit;
+  totalWaterUsage_FY?: number;
+  totalElectricityConsumption_FY?: number;
+  totalFuelConsumption_FY?: number;
+  fuelUnit?: FuelUnit;
 }
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────

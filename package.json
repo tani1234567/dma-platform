@@ -12,6 +12,7 @@
     "seed:admin": "npx tsx --env-file=.env.local scripts/seedSuperAdmin.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.91.1",
     "@getbrevo/brevo": "^5.0.3",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -41,6 +42,7 @@
     "lucide-react": "^1.7.0",
     "next": "16.2.1",
     "next-intl": "^4.8.3",
+    "openai": "^6.34.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.72.0",

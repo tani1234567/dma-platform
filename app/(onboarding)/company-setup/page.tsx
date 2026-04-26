@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import INDUSTRY_TYPES from "@/data/industryTypes";
+import INDUSTRY_CATEGORIES from "@/data/industryTypes";
 import type { EmployeeTable, EmployeeAgeGroup, AreaUnit, FuelUnit } from "@/types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -97,22 +97,22 @@ const step1Schema = z.object({
   industryType: z.string().min(1, "Please select an industry type"),
   address: z.string().min(10, "Please enter the registered address"),
   manufacturingUnitLocation: z.string().min(2, "Location is required"),
-  areaOfManufacturingUnit: z.number().positive("Area must be greater than 0"),
-  areaUnit: z.enum(["sqm", "acres", "sqft"]),
+  areaOfManufacturingUnit: z.union([z.number().positive("Area must be greater than 0"), z.nan()]).optional().transform((v) => (typeof v === "number" && isNaN(v) ? undefined : v)),
+  areaUnit: z.enum(["sqm", "acres", "sqft"]).optional(),
 });
 
 const step2Schema = z.object({
-  totalWaterUsage_FY: z.number().min(0, "Cannot be negative"),
-  totalElectricityConsumption_FY: z.number().min(0, "Cannot be negative"),
-  totalFuelConsumption_FY: z.number().min(0, "Cannot be negative"),
-  fuelUnit: z.enum(["litres", "GJ"]),
+  totalWaterUsage_FY: z.union([z.number().min(0, "Cannot be negative"), z.nan()]).optional().transform((v) => (typeof v === "number" && isNaN(v) ? undefined : v)),
+  totalElectricityConsumption_FY: z.union([z.number().min(0, "Cannot be negative"), z.nan()]).optional().transform((v) => (typeof v === "number" && isNaN(v) ? undefined : v)),
+  totalFuelConsumption_FY: z.union([z.number().min(0, "Cannot be negative"), z.nan()]).optional().transform((v) => (typeof v === "number" && isNaN(v) ? undefined : v)),
+  fuelUnit: z.enum(["litres", "GJ"]).optional(),
 });
 
 // Derive form value types from schemas so the resolver and useForm agree
 type Step1Values = z.infer<typeof step1Schema>;
 type Step2Values = z.infer<typeof step2Schema>;
 
-// ─── Searchable Industry Select ───────────────────────────────────────────────
+// ─── Two-Level Industry Select ────────────────────────────────────────────────
 
 function IndustrySelect({
   value,
@@ -123,49 +123,48 @@ function IndustrySelect({
   onChange: (v: string) => void;
   error?: string;
 }) {
-  const [query, setQuery] = useState(value);
-  const [open, setOpen] = useState(false);
+  const selectedCategory = INDUSTRY_CATEGORIES.find((c) => c.types.includes(value));
+  const [categoryLabel, setCategoryLabel] = useState(selectedCategory?.label ?? "");
 
-  const filtered = query.length > 0
-    ? INDUSTRY_TYPES.filter((t) => t.toLowerCase().includes(query.toLowerCase())).slice(0, 40)
-    : INDUSTRY_TYPES.slice(0, 40);
+  const categoryTypes = INDUSTRY_CATEGORIES.find((c) => c.label === categoryLabel)?.types ?? [];
 
-  function select(item: string) {
-    onChange(item);
-    setQuery(item);
-    setOpen(false);
+  function handleCategoryChange(label: string) {
+    setCategoryLabel(label);
+    onChange("");
+  }
+
+  function handleTypeChange(type: string) {
+    onChange(type);
   }
 
   return (
-    <div className="relative">
-      <Input
-        placeholder="Search industry type…"
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          onChange("");
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+    <div className="space-y-2">
+      <select
+        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#333a8b]"
+        value={categoryLabel}
+        onChange={(e) => handleCategoryChange(e.target.value)}
         aria-invalid={!!error}
-        autoComplete="off"
-      />
-      {open && filtered.length > 0 && (
-        <ul className="absolute z-50 mt-1 w-full max-h-56 overflow-y-auto rounded-md border bg-white shadow-lg text-sm">
-          {filtered.map((item) => (
-            <li
-              key={item}
-              className={`px-3 py-2 cursor-pointer hover:bg-[#333a8b]/10 ${
-                item === value ? "bg-[#333a8b]/10 font-medium" : ""
-              }`}
-              onMouseDown={() => select(item)}
-            >
-              {item}
-            </li>
+      >
+        <option value="">Select a category…</option>
+        {INDUSTRY_CATEGORIES.map((c) => (
+          <option key={c.label} value={c.label}>{c.label}</option>
+        ))}
+      </select>
+
+      {categoryLabel && (
+        <select
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#333a8b]"
+          value={value}
+          onChange={(e) => handleTypeChange(e.target.value)}
+          aria-invalid={!!error}
+        >
+          <option value="">Select an industry type…</option>
+          {categoryTypes.map((t) => (
+            <option key={t} value={t}>{t}</option>
           ))}
-        </ul>
+        </select>
       )}
+
       {error && <p className="text-xs text-destructive mt-1">{error}</p>}
     </div>
   );
@@ -195,7 +194,7 @@ function Step1BasicInfo({ onNext }: { onNext: () => void }) {
       industryType: "",
       address: "",
       manufacturingUnitLocation: "",
-      areaOfManufacturingUnit: 0,
+      areaOfManufacturingUnit: undefined,
       areaUnit: "sqm",
     },
   });
@@ -283,7 +282,7 @@ function Step1BasicInfo({ onNext }: { onNext: () => void }) {
 
       {/* Company Logo */}
       <div className="space-y-1.5">
-        <Label>Company Logo</Label>
+        <Label>Company Logo <span className="text-muted-foreground font-normal text-xs">(Optional)</span></Label>
         <div className="flex items-start gap-4">
           {localPreview ? (
             <div className="relative w-20 h-20 rounded-lg border overflow-hidden flex-shrink-0">
@@ -355,7 +354,7 @@ function Step1BasicInfo({ onNext }: { onNext: () => void }) {
       {/* Area of Manufacturing Unit */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="areaOfManufacturingUnit">Area of Manufacturing Unit</Label>
+          <Label htmlFor="areaOfManufacturingUnit">Area of Manufacturing Unit <span className="text-muted-foreground font-normal text-xs">(Optional)</span></Label>
           <Input
             id="areaOfManufacturingUnit"
             type="number"
@@ -409,6 +408,7 @@ function ResourceField({
   placeholder,
   reg,
   error,
+  optional,
 }: {
   id: NumericResourceKey;
   label: string;
@@ -416,12 +416,13 @@ function ResourceField({
   placeholder: string;
   reg: UseFormRegister<Step2Values>;
   error?: string;
+  optional?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>
         {label}{" "}
-        <span className="text-muted-foreground font-normal text-xs">(Last Financial Year — {FY_LABEL})</span>
+        <span className="text-muted-foreground font-normal text-xs">(Last Financial Year — {FY_LABEL}{optional ? ", Optional" : ""})</span>
       </Label>
       <div className="flex gap-2">
         <Input
@@ -454,9 +455,9 @@ function Step2Resources({ onNext, onBack }: { onNext: () => void; onBack: () => 
   } = useForm<Step2Values>({
     resolver: zodResolver(step2Schema),
     defaultValues: resources ?? {
-      totalWaterUsage_FY: 0,
-      totalElectricityConsumption_FY: 0,
-      totalFuelConsumption_FY: 0,
+      totalWaterUsage_FY: undefined,
+      totalElectricityConsumption_FY: undefined,
+      totalFuelConsumption_FY: undefined,
       fuelUnit: "litres",
     },
   });
@@ -477,6 +478,7 @@ function Step2Resources({ onNext, onBack }: { onNext: () => void; onBack: () => 
         placeholder="12500"
         reg={register}
         error={errors.totalWaterUsage_FY?.message}
+        optional
       />
 
       <ResourceField
@@ -486,12 +488,13 @@ function Step2Resources({ onNext, onBack }: { onNext: () => void; onBack: () => 
         placeholder="850000"
         reg={register}
         error={errors.totalElectricityConsumption_FY?.message}
+        optional
       />
 
       <div className="space-y-1.5">
         <Label htmlFor="totalFuelConsumption_FY">
           Total Fuel Consumption{" "}
-          <span className="text-muted-foreground font-normal text-xs">(Last Financial Year — {FY_LABEL})</span>
+          <span className="text-muted-foreground font-normal text-xs">(Last Financial Year — {FY_LABEL}, Optional)</span>
         </Label>
         <div className="flex gap-2">
           <Input
@@ -707,8 +710,8 @@ function Step3Employees({
 
   return (
     <div className="space-y-8">
-      <EmployeeGrid title="Permanent Employees" data={permanent} onChange={updatePermanent} />
-      <EmployeeGrid title="Contract Employees" data={contract} onChange={updateContract} />
+      <EmployeeGrid title="Permanent Employees (Optional)" data={permanent} onChange={updatePermanent} />
+      <EmployeeGrid title="Contract Employees (Optional)" data={contract} onChange={updateContract} />
 
       {/* Grand combined total */}
       <div className="flex items-center justify-end gap-3 rounded-lg border bg-[#333a8b]/5 px-4 py-3">
@@ -757,24 +760,27 @@ export default function CompanySetupPage() {
     const uid = firebaseUser.uid;
     let logoURL: string | undefined;
     if (store.logoFile) logoURL = await uploadCompanyLogo(uid, store.logoFile);
-    await upsertCompany(uid, {
+
+    const companyData: Parameters<typeof upsertCompany>[1] = {
       adminUid: uid, status: "active",
-      name:                          store.basicInfo.companyName,
-      cinNumber:                     store.basicInfo.cinNumber,
-      industry:                      store.basicInfo.industryType,
-      address:                       store.basicInfo.address,
-      country:                       "India",
-      manufacturingUnitLocation:     store.basicInfo.manufacturingUnitLocation,
-      areaOfManufacturingUnit:       store.basicInfo.areaOfManufacturingUnit,
-      areaUnit:                      store.basicInfo.areaUnit,
-      logoURL,
-      totalWaterUsage_FY:            store.resources.totalWaterUsage_FY,
-      totalElectricityConsumption_FY:store.resources.totalElectricityConsumption_FY,
-      totalFuelConsumption_FY:       store.resources.totalFuelConsumption_FY,
-      fuelUnit:                      store.resources.fuelUnit,
-      permanentEmployees,
-      contractEmployees,
-    });
+      name:                      store.basicInfo.companyName,
+      cinNumber:                 store.basicInfo.cinNumber,
+      industry:                  store.basicInfo.industryType,
+      address:                   store.basicInfo.address,
+      country:                   "India",
+      manufacturingUnitLocation: store.basicInfo.manufacturingUnitLocation,
+    };
+    if (logoURL !== undefined)                                    companyData.logoURL = logoURL;
+    if (store.basicInfo.areaOfManufacturingUnit !== undefined)    companyData.areaOfManufacturingUnit = store.basicInfo.areaOfManufacturingUnit;
+    if (store.basicInfo.areaUnit !== undefined)                   companyData.areaUnit = store.basicInfo.areaUnit;
+    if (store.resources.totalWaterUsage_FY !== undefined)         companyData.totalWaterUsage_FY = store.resources.totalWaterUsage_FY;
+    if (store.resources.totalElectricityConsumption_FY !== undefined) companyData.totalElectricityConsumption_FY = store.resources.totalElectricityConsumption_FY;
+    if (store.resources.totalFuelConsumption_FY !== undefined)    companyData.totalFuelConsumption_FY = store.resources.totalFuelConsumption_FY;
+    if (store.resources.fuelUnit !== undefined)                   companyData.fuelUnit = store.resources.fuelUnit;
+    if (grandTotal(permanentEmployees) > 0)                       companyData.permanentEmployees = permanentEmployees;
+    if (grandTotal(contractEmployees) > 0)                        companyData.contractEmployees = contractEmployees;
+
+    await upsertCompany(uid, companyData);
     await updateUserDocument(uid, { registrationComplete: true, companyId: uid });
     store.reset();
     router.push("/dashboard");

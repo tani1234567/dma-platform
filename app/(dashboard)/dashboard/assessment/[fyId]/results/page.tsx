@@ -17,6 +17,7 @@ import { AlertCircle, ChevronDown, ChevronUp, Download, RefreshCw, Users } from 
 import { useAuth } from "@/hooks/useAuth";
 import {
   getAssessment,
+  getCompany,
   getGRITopics,
   getScores,
   getStakeholders,
@@ -244,6 +245,22 @@ function Skeleton({ className }: { className?: string }) {
   return <div className={cn("bg-gray-100 animate-pulse rounded-xl", className)} />;
 }
 
+// ─── AI Analysis types ────────────────────────────────────────────────────────
+
+interface MaturityAnalysis {
+  headline: string;
+  overallReadiness: string;
+  criticalTopicsInterpretation: string;
+  importantTopicsInterpretation: string;
+  considerTopicsInterpretation: string;
+  monitorTopicsInterpretation: string;
+  esgBalance: string;
+  stakeholderSignals: string;
+  topRecommendations: string[];
+  risksIfUnaddressed: string;
+  quickWins: string;
+}
+
 function Toast({ message, error }: { message: string; error?: boolean }) {
   return (
     <div className={cn(
@@ -318,6 +335,10 @@ export default function ResultsPage() {
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
   const [chartFilter, setChartFilter] = useState<PillarFilter>("ALL");
+  const [aiAnalysis, setAiAnalysis] = useState<MaturityAnalysis | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState<string>("");
 
   const companyId = firebaseUser?.uid ?? "";
   const matrixSvgRef = useRef<SVGSVGElement>(null);
@@ -341,12 +362,14 @@ export default function ResultsPage() {
           getScores(companyId, fyId).catch(() => null),
           getStakeholders(companyId, fyId).catch(() => []),
           getGRITopics().catch(() => []),
-        ]).then(([s, sh, topics]) => {
+          getCompany(companyId).catch(() => null),
+        ]).then(([s, sh, topics, company]) => {
           setScores(s);
           setStakeholders(sh as Stakeholder[]);
           const map = new Map<string, GRITopic>();
           for (const t of (topics as GRITopic[])) map.set(t.code, t);
           setTopicMap(map);
+          if (company) setCompanyName(company.name);
         }).finally(() => setLoading(false));
       })
       .catch(() => { setLoadError(true); setLoading(false); });
@@ -492,6 +515,53 @@ export default function ResultsPage() {
 
   function handleThresholdChange(impact: number, financial: number) {
     setMatrixThresholds({ impact, financial });
+  }
+
+  async function handleGenerateAnalysis() {
+    if (!scores || !companyId || aiLoading) return;
+    setAiLoading(true);
+    setAiError(null);
+
+    const topics = Object.entries(scores.topicScores).map(([code, s]) => {
+      const topic = topicMap.get(code);
+      return {
+        code,
+        name: topic?.name ?? code,
+        description: topic?.description ?? "",
+        griReference: topic?.griReference ?? "",
+        pillar: topic?.pillar ?? "",
+        pillarCode: topic?.pillarCode ?? code.charAt(0),
+        impactScore: s.impactScore,
+        financialScore: s.financialScore,
+        combinedScore: s.combinedScore,
+        quadrant: s.quadrant,
+        respondentCount: s.respondentCount,
+        comments: s.comments ?? [],
+      };
+    });
+
+    try {
+      const res = await fetch("/api/analysis/materiality", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName: companyName || companyId,
+          financialYear: assessment?.financialYear ?? fyId,
+          totalResponses: scores.totalResponses,
+          stakeholderCount: assessment?.stakeholderCount ?? 0,
+          impactThreshold: scores.impactThreshold,
+          financialThreshold: scores.financialThreshold,
+          topics,
+        }),
+      });
+      const data = (await res.json()) as { analysis?: MaturityAnalysis; error?: string };
+      if (!res.ok || !data.analysis) throw new Error(data.error ?? "Unknown error");
+      setAiAnalysis(data.analysis);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "Failed to generate analysis.");
+    } finally {
+      setAiLoading(false);
+    }
   }
 
   async function handleDownloadPdf() {
@@ -1014,6 +1084,135 @@ export default function ResultsPage() {
                 onTopicClick={handleTopicClick}
                 onThresholdChange={handleThresholdChange}
               />
+            </div>
+          </div>
+
+          {/* ── AI ANALYSIS ─────────────────────────────────────────────────── */}
+          <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">AI Interpretation</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Claude analyses the matrix and gives you actionable insight
+                </p>
+              </div>
+              <button
+                onClick={() => void handleGenerateAnalysis()}
+                disabled={aiLoading}
+                className="inline-flex items-center gap-2 px-4 h-8 rounded-lg text-xs font-semibold bg-[#333a8b] text-white hover:bg-[#2a3070] disabled:opacity-60 transition-colors"
+              >
+                {aiLoading ? (
+                  <>
+                    <svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    Analysing…
+                  </>
+                ) : aiAnalysis ? "Re-generate" : "Generate Analysis"}
+              </button>
+            </div>
+
+            <div className="p-6">
+              {!aiAnalysis && !aiLoading && !aiError && (
+                <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-[#eff2ff] flex items-center justify-center text-[#333a8b] text-xl">✦</div>
+                  <p className="text-sm font-medium text-gray-700">Get an AI-powered interpretation of your Materiality Matrix</p>
+                  <p className="text-xs text-muted-foreground max-w-sm">
+                    Claude will analyse quadrant distribution, ESG balance, stakeholder signals, and produce prioritised recommendations.
+                  </p>
+                </div>
+              )}
+
+              {aiLoading && (
+                <div className="space-y-3">
+                  {[...Array<number>(5)].map((_, i) => (
+                    <div key={i} className={cn("h-4 bg-gray-100 animate-pulse rounded-md", i === 0 ? "w-3/4" : i === 4 ? "w-1/2" : "w-full")} />
+                  ))}
+                </div>
+              )}
+
+              {aiError && (
+                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                  {aiError}
+                </div>
+              )}
+
+              {aiAnalysis && !aiLoading && (
+                <div className="space-y-6">
+                  {/* Headline + readiness badge */}
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                    <p className="text-base font-semibold text-gray-900 flex-1">{aiAnalysis.headline}</p>
+                    <span className={cn(
+                      "shrink-0 inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap",
+                      aiAnalysis.overallReadiness === "Strong"          && "bg-green-100 text-green-700",
+                      aiAnalysis.overallReadiness === "Moderate"        && "bg-blue-100 text-blue-700",
+                      aiAnalysis.overallReadiness === "Developing"      && "bg-amber-100 text-amber-700",
+                      aiAnalysis.overallReadiness === "Needs Attention" && "bg-red-100 text-red-700",
+                    )}>
+                      {aiAnalysis.overallReadiness}
+                    </span>
+                  </div>
+
+                  {/* Quadrant interpretations */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      { label: "Critical Topics", text: aiAnalysis.criticalTopicsInterpretation, bg: "#fee2e2", color: "#991b1b", border: "#fecaca" },
+                      { label: "Important Topics", text: aiAnalysis.importantTopicsInterpretation, bg: "#ffedd5", color: "#9a3412", border: "#fed7aa" },
+                      { label: "Consider Topics", text: aiAnalysis.considerTopicsInterpretation, bg: "#dbeafe", color: "#1e40af", border: "#bfdbfe" },
+                      { label: "Monitor Topics", text: aiAnalysis.monitorTopicsInterpretation, bg: "#f3f4f6", color: "#374151", border: "#e5e7eb" },
+                    ].map(({ label, text, bg, color, border }) => (
+                      <div key={label} className="rounded-lg p-4 text-sm" style={{ backgroundColor: bg, border: `1px solid ${border}` }}>
+                        <p className="font-semibold mb-1.5" style={{ color }}>{label}</p>
+                        <p className="leading-relaxed" style={{ color }}>{text}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* ESG balance + stakeholder signals */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="rounded-lg border border-border bg-gray-50 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">ESG Balance</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{aiAnalysis.esgBalance}</p>
+                    </div>
+                    <div className="rounded-lg border border-border bg-gray-50 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Stakeholder Signals</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{aiAnalysis.stakeholderSignals}</p>
+                    </div>
+                  </div>
+
+                  {/* Top recommendations */}
+                  <div className="rounded-lg border border-[#333a8b]/20 bg-[#eff2ff] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#333a8b] mb-3">Top Recommendations</p>
+                    <ol className="space-y-2">
+                      {aiAnalysis.topRecommendations.map((rec, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-[#1e2563]">
+                          <span className="shrink-0 w-5 h-5 rounded-full bg-[#333a8b] text-white text-xs font-bold flex items-center justify-center mt-0.5">
+                            {i + 1}
+                          </span>
+                          {rec}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {/* Risks + quick wins */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-red-600 mb-2">Risks If Unaddressed</p>
+                      <p className="text-sm text-red-700 leading-relaxed">{aiAnalysis.risksIfUnaddressed}</p>
+                    </div>
+                    <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-green-600 mb-2">Quick Wins</p>
+                      <p className="text-sm text-green-700 leading-relaxed">{aiAnalysis.quickWins}</p>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-muted-foreground text-right">
+                    Generated by Claude Sonnet (via YepAPI) · Based on {scores?.totalResponses ?? 0} responses across {Object.keys(scores?.topicScores ?? {}).length} topics
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

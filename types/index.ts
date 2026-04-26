@@ -101,8 +101,8 @@ export interface Company {
   address: string;
   country: string;
   manufacturingUnitLocation: string;
-  areaOfManufacturingUnit: number;
-  areaUnit: AreaUnit;
+  areaOfManufacturingUnit?: number;
+  areaUnit?: AreaUnit;
   logoURL?: string;
 
   // Step 2 — Resource Consumption (Last FY)
