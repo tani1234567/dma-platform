@@ -24,7 +24,7 @@ export function Navbar() {
           alt="DMA Logo"
           width={40}
           height={40}
-          className="rounded"
+          className="rounded-[10px]"
         />
         <div className="hidden sm:flex flex-col">
           <span className="text-[#ff6900] text-base">Swifora</span>

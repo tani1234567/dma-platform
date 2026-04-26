@@ -80,6 +80,7 @@ export function Sidebar() {
           alt="DMA Logo"
           width={50}
           height={50}
+          className="rounded-[15px]"
         />
       </div>
       {/* Header identity */}

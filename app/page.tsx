@@ -49,7 +49,7 @@ export default function LandingPage() {
             alt="DMA Platform Logo"
             width={200}
             height={200}
-            className="mb-6"
+            className="mb-6 rounded-[20px]"
             priority
           />
           <p className="text-5xl font-extrabold text-white tracking-tight leading-none">

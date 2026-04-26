@@ -130,6 +130,7 @@ function LoginForm() {
         alt="DMA Platform Logo"
         width={120}
         height={120}
+        className="rounded-[20px]"
         priority
       />
       <Card className="shadow-sm w-full">
