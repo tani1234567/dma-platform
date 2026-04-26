@@ -187,16 +187,16 @@ function Step1BasicInfo({ onNext }: { onNext: () => void }) {
     watch,
     formState: { errors },
   } = useForm<Step1Values>({
-    resolver: zodResolver(step1Schema),
-    defaultValues: basicInfo ?? {
-      companyName: "",
-      cinNumber: "",
-      industryType: "",
-      address: "",
-      manufacturingUnitLocation: "",
-      areaOfManufacturingUnit: undefined,
-      areaUnit: "sqm",
-    },
+    resolver: zodResolver(step1Schema) as any,
+    defaultValues: {
+      companyName: basicInfo?.companyName ?? "",
+      cinNumber: basicInfo?.cinNumber ?? "",
+      industryType: basicInfo?.industryType ?? "",
+      address: basicInfo?.address ?? "",
+      manufacturingUnitLocation: basicInfo?.manufacturingUnitLocation ?? "",
+      areaOfManufacturingUnit: basicInfo?.areaOfManufacturingUnit,
+      areaUnit: basicInfo?.areaUnit ?? "sqm",
+    } as Step1Values,
   });
 
   const industryValue = watch("industryType");
@@ -453,13 +453,13 @@ function Step2Resources({ onNext, onBack }: { onNext: () => void; onBack: () => 
     watch,
     formState: { errors },
   } = useForm<Step2Values>({
-    resolver: zodResolver(step2Schema),
-    defaultValues: resources ?? {
-      totalWaterUsage_FY: undefined,
-      totalElectricityConsumption_FY: undefined,
-      totalFuelConsumption_FY: undefined,
-      fuelUnit: "litres",
-    },
+    resolver: zodResolver(step2Schema) as any,
+    defaultValues: {
+      totalWaterUsage_FY: resources?.totalWaterUsage_FY,
+      totalElectricityConsumption_FY: resources?.totalElectricityConsumption_FY,
+      totalFuelConsumption_FY: resources?.totalFuelConsumption_FY,
+      fuelUnit: resources?.fuelUnit ?? "litres",
+    } as Step2Values,
   });
 
   const fuelUnit = watch("fuelUnit");

@@ -2,10 +2,11 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_FIREBASE_API_KEY=${_FIREBASE_API_KEY}'
       - '-t'
       - 'gcr.io/swifora/dma-platform'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyC6xVrYGXETSr7xrrLstMzmg_JE0rhxsEM'
       - '.'
+
 images:
   - 'gcr.io/swifora/dma-platform'
