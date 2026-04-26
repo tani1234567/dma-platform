@@ -42,16 +42,20 @@ export default function LandingPage() {
           style={{ background: "radial-gradient(circle, #6366f1, transparent)" }}
         />
 
-        {/* Logo */}
-        <div className="relative z-10 mb-8 flex flex-col items-center">
+        {/* Logo in top-right corner */}
+        <div className="absolute top-6 right-6 z-20">
           <Image
             src="/DMA_logo.png"
             alt="DMA Platform Logo"
-            width={200}
-            height={200}
-            className="mb-6 rounded-[20px]"
+            width={70}
+            height={70}
+            className="rounded-[12px]"
             priority
           />
+        </div>
+
+        {/* Main Title */}
+        <div className="relative z-10 mb-8 flex flex-col items-center">
           <p className="text-5xl font-extrabold text-white tracking-tight leading-none">
             Swifora
           </p>
