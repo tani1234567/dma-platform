@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { UserRole } from "@/types";
@@ -17,9 +18,18 @@ export function Navbar() {
 
   return (
     <header className="h-14 bg-[#333a8b] text-white flex items-center px-6 shadow-sm">
-      <Link href={dashboardHref} className="flex items-center gap-2 font-bold text-lg tracking-tight">
-        <span className="text-[#ff6900]">Swifora</span>
-        <span className="text-white/80 font-normal text-sm">DMA Platform</span>
+      <Link href={dashboardHref} className="flex items-center gap-3 font-bold text-lg tracking-tight">
+        <Image
+          src="/DMA_logo.png"
+          alt="DMA Logo"
+          width={40}
+          height={40}
+          className="rounded"
+        />
+        <div className="hidden sm:flex flex-col">
+          <span className="text-[#ff6900] text-base">Swifora</span>
+          <span className="text-white/70 font-normal text-xs">DMA Platform</span>
+        </div>
       </Link>
 
       <nav className="ml-auto flex items-center gap-4">

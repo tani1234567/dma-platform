@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Swifora DMA Platform",
   description: "Double Materiality Assessment Platform",
+  icons: {
+    icon: "/DMA_logo.png",
+    apple: "/DMA_logo.png",
+  },
 };
 
 export default function RootLayout({

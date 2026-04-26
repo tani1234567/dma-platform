@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BarChart3, Users, BookOpen } from "lucide-react";
 
 // ─── Feature card data ────────────────────────────────────────────────────────
@@ -42,7 +43,15 @@ export default function LandingPage() {
         />
 
         {/* Logo */}
-        <div className="relative z-10 mb-8">
+        <div className="relative z-10 mb-8 flex flex-col items-center">
+          <Image
+            src="/DMA_logo.png"
+            alt="DMA Platform Logo"
+            width={200}
+            height={200}
+            className="mb-6"
+            priority
+          />
           <p className="text-5xl font-extrabold text-white tracking-tight leading-none">
             Swifora
           </p>

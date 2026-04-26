@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
+import Image from "next/image";
 import { signIn } from "@/lib/firebase/auth";
 import { getUserDocument } from "@/lib/firebase/firestore";
 import { useAuthStore } from "@/store/authStore";
@@ -123,11 +124,19 @@ function LoginForm() {
   }
 
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl text-[#333a8b]">Welcome back</CardTitle>
-        <CardDescription>Sign in to your Swifora account</CardDescription>
-      </CardHeader>
+    <div className="flex flex-col items-center gap-6">
+      <Image
+        src="/DMA_logo.png"
+        alt="DMA Platform Logo"
+        width={120}
+        height={120}
+        priority
+      />
+      <Card className="shadow-sm w-full">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl text-[#333a8b]">Welcome back</CardTitle>
+          <CardDescription>Sign in to your Swifora account</CardDescription>
+        </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <div className="space-y-1.5">
@@ -194,6 +203,7 @@ function LoginForm() {
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 }
 

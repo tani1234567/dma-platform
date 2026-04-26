@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Home,
@@ -72,6 +73,15 @@ export function Sidebar() {
 
   return (
     <aside className="w-[220px] h-full bg-white border-r border-border flex flex-col">
+      {/* Logo */}
+      <div className="px-4 py-4 border-b border-border flex items-center justify-center">
+        <Image
+          src="/DMA_logo.png"
+          alt="DMA Logo"
+          width={50}
+          height={50}
+        />
+      </div>
       {/* Header identity */}
       <div className="px-4 py-5 border-b border-border">
         {isSuperAdmin ? (
